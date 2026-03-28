@@ -1,0 +1,23 @@
+{
+	"name": "@repo/shared",
+	"version": "0.0.0",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup",
+		"clean": "rm -rf dist"
+	},
+	"devDependencies": {
+		"@repo/typescript-config": "*",
+		"@types/minimatch": "5.1.2",
+		"@types/react": "^18.2.14",
+		"tsup": "^8.0.1",
+		"typescript": "5.5.4"
+	},
+	"dependencies": {
+		"react": "^18.2.0",
+		"react-native": "0.76.9",
+		"ws": "^8.18.3"
+	}
+}
