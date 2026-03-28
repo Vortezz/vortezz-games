@@ -45,6 +45,10 @@ export class WebSocketClient {
 			type: key,
 			data: data,
 		}, function (key, value) {
+			if (key == "ws" || key == "room" || key == "handlers") {
+				return undefined;
+			}
+
 			if (value instanceof Map) {
 				return {
 					objectType: "map",
@@ -52,7 +56,7 @@ export class WebSocketClient {
 				};
 			}
 
-			return (key == "ws" || key == "game" || key == "handler") ? undefined : value;
+			return value;
 		}));
 	}
 

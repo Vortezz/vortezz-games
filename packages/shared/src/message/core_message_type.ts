@@ -6,6 +6,7 @@ interface CoreMessageTypings {
 	pong: void;
 	roomData: Room;
 	gameStarted: void;
+	gameEnded: void;
 
 	// Clientbound
 	ping: void;

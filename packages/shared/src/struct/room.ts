@@ -1,5 +1,5 @@
 import { WebSocketClient } from "./websocket_client";
-import { AbstractGame, GamePlayer } from "./abstract_game";
+import { AbstractGame, DefaultGame, GamePlayer } from "./abstract_game";
 import { CoreMessageTypings } from "../message/core_message_type";
 
 type Handler<E extends keyof RoomEvents> = (data: RoomEvents[E]) => void;
@@ -19,7 +19,7 @@ export class Room {
 	// eslint-disable-next-line
 	private readonly handlers: Map<keyof RoomEvents, Handler<any>> = new Map<keyof RoomEvents, Handler<any>>();
 
-	private game: AbstractGame<CoreMessageTypings> | undefined;
+	private game: AbstractGame<CoreMessageTypings> = new DefaultGame(this);
 
 	public constructor(id: string, name: string, password: string | null) {
 		this.id = id;

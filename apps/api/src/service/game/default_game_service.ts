@@ -5,6 +5,8 @@ export default class DefaultGameService extends AbstractGameService<CoreMessageT
 
 	startGame(game: AbstractGame<RpsMessageTypings>): void {
 		super.startGame(game);
+
+		setTimeout(() => this.endGame(game), 2000);
 	}
 
 	registerClient(game: AbstractGame<RpsMessageTypings>, ws: WebSocketClient): void {
