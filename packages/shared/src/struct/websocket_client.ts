@@ -52,7 +52,7 @@ export class WebSocketClient {
 				};
 			}
 
-			return (key == "ws") ? undefined : value;
+			return (key == "ws" || key == "game" || key == "handler") ? undefined : value;
 		}));
 	}
 

@@ -1,9 +1,10 @@
 import { AbstractGame, GameTypes } from "../struct/abstract_game";
+import { Room } from "../struct/room";
 
 interface CoreMessageTypings {
 	// Serverbound
 	pong: void;
-	gameData: AbstractGame<CoreMessageTypings>;
+	roomData: Room;
 	gameStarted: void;
 
 	// Clientbound
@@ -11,6 +12,10 @@ interface CoreMessageTypings {
 	startGame: void;
 	abortGame: void;
 	setType: GameTypes;
+
+	// Both
+	// eslint-disable-next-line
+	gameEvent: any;
 }
 
 type CoreMessageType = keyof CoreMessageTypings;

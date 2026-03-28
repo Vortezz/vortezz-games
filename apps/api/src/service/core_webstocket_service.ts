@@ -1,6 +1,6 @@
 import { WebSocketServer } from "ws";
-import GamesService from "./games_service";
-import { AbstractGame, CoreMessageTypings, WebSocketClient } from "@repo/shared";
+import RoomsService from "./rooms_service";
+import { Room, WebSocketClient } from "@repo/shared";
 
 export default class CoreWebsocketService {
 
@@ -31,37 +31,37 @@ export default class CoreWebsocketService {
 				|| ((id === null || id === "") && action !== "create")
 				|| ((roomName === null || roomName === "") && action === "create")) {
 				// TODO
-				console.log("Missing argument")
+				console.log("Missing argument");
 				ws.close(3000);
 				return;
 			}
 
-			let game: AbstractGame<CoreMessageTypings> | undefined;
+			let room: Room | undefined;
 			if (action === "create") {
-				game = GamesService.INSTANCE.createGame(roomName ?? "", password);
+				room = RoomsService.INSTANCE.createRoom(roomName ?? "", password);
 			} else {
-				game = GamesService.INSTANCE.getGame(id ?? "");
+				room = RoomsService.INSTANCE.getRoom(id ?? "");
 
-				if (game && !game.checkPassword(password)) {
+				if (room && !room.checkPassword(password)) {
 					// TODO
-					console.log("Invalid pswd")
+					console.log("Invalid pswd");
 					return;
 				}
 			}
 
-			if (game === undefined) {
+			if (room === undefined) {
 				// TODO
-				console.log("No game")
+				console.log("No room");
 				return;
 			}
 
 			// eslint-disable-next-line
 			// @ts-ignore
-			const wsClient = new WebSocketClient(ws, game);
+			const wsClient = new WebSocketClient(ws, room);
 
 			// TODO : Store WS
 
-			GamesService.INSTANCE.registerPlayer(game, wsClient, name);
+			RoomsService.INSTANCE.registerPlayer(room, wsClient, name);
 
 			// TODO : Generate player id
 		});
