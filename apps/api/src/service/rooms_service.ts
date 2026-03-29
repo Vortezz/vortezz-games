@@ -1,4 +1,4 @@
-import { CoreMessageTypings, GameTypes, Room, WebSocketClient } from "@repo/shared";
+import { AbstractGame, CoreMessageTypings, GameTypes, generateString, Room, WebSocketClient } from "@repo/shared";
 import RockPaperScissorsGameService from "./game/rps_game_service";
 import AbstractGameService from "./abstract_game_service";
 import DefaultGameService from "./game/default_game_service";
@@ -7,7 +7,7 @@ export default class RoomsService {
 
 	public static INSTANCE: RoomsService = new RoomsService();
 
-	private availableGameServices = new Map<GameTypes, AbstractGameService<CoreMessageTypings>>();
+	private availableGameServices = new Map<GameTypes, AbstractGameService<AbstractGame<CoreMessageTypings>, CoreMessageTypings>>();
 	private currentRooms = new Map<string, Room>();
 
 	public initialize() {
@@ -20,7 +20,7 @@ export default class RoomsService {
 	}
 
 	public createRoom(name: string, password: string | null): Room {
-		const id = "ekalia"; // TODO : Generate it
+		const id = generateString(12); // TODO : Generate it
 
 		const room = new Room(id, name, password);
 
@@ -30,11 +30,9 @@ export default class RoomsService {
 	}
 
 	public registerPlayer(room: Room, wsClient: WebSocketClient, name: string) {
-		const playerId = name; // TODO : Generate him
-
 		// TODO : Prevent from using a name already used
 
-		const isOwner = room.registerPlayer(name, wsClient, playerId, undefined);
+		const isOwner = room.registerPlayer(name, wsClient, undefined, undefined);
 
 		wsClient.send("roomData", room);
 

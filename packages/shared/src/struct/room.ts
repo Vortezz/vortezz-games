@@ -1,6 +1,7 @@
 import { WebSocketClient } from "./websocket_client";
-import { AbstractGame, DefaultGame, GamePlayer } from "./abstract_game";
+import { AbstractGame, DefaultGame, GamePlayer } from "./game/abstract_game";
 import { CoreMessageTypings } from "../message/core_message_type";
+import { generateString } from "../util/random_util";
 
 type Handler<E extends keyof RoomEvents> = (data: RoomEvents[E]) => void;
 
@@ -39,7 +40,7 @@ export class Room {
 	public registerPlayer(name: string, ws: WebSocketClient | undefined, id: string | undefined, owner: boolean | undefined): boolean {
 		let realId = id;
 		if (realId === undefined) {
-			realId = ""; // TODO : Generate it
+			realId = generateString(10);
 		}
 
 		let realOwner = owner;

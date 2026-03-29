@@ -1,19 +1,19 @@
 import AbstractGameService from "../abstract_game_service";
-import { AbstractGame, CoreMessageTypings, RpsMessageTypings, WebSocketClient } from "@repo/shared";
+import { CoreMessageTypings, DefaultGame, WebSocketClient } from "@repo/shared";
 
-export default class DefaultGameService extends AbstractGameService<CoreMessageTypings> {
+export default class DefaultGameService extends AbstractGameService<DefaultGame, CoreMessageTypings> {
 
-	startGame(game: AbstractGame<RpsMessageTypings>): void {
+	startGame(game: DefaultGame): void {
 		super.startGame(game);
 
 		setTimeout(() => this.endGame(game), 2000);
 	}
 
-	registerClient(game: AbstractGame<RpsMessageTypings>, ws: WebSocketClient): void {
+	registerClient(game: DefaultGame, ws: WebSocketClient): void {
 		// Nothing
 	}
 
-	endGame(game: AbstractGame<RpsMessageTypings>): void {
+	endGame(game: DefaultGame): void {
 		super.endGame(game);
 	}
 }

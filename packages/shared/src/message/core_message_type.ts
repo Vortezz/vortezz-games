@@ -1,4 +1,4 @@
-import { AbstractGame, GameTypes } from "../struct/abstract_game";
+import { GameTypes } from "../struct/game/abstract_game";
 import { Room } from "../struct/room";
 
 interface CoreMessageTypings {

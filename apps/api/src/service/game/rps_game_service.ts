@@ -1,17 +1,17 @@
 import AbstractGameService from "../abstract_game_service";
-import { AbstractGame, RpsMessageTypings, WebSocketClient } from "@repo/shared";
+import { RockPaperScissorsGame, AbstractGame, RpsMessageTypings, WebSocketClient } from "@repo/shared";
 
-export default class RockPaperScissorsGameService extends AbstractGameService<RpsMessageTypings> {
+export default class RockPaperScissorsGameService extends AbstractGameService<RockPaperScissorsGame, RpsMessageTypings> {
 
-	startGame(game: AbstractGame<RpsMessageTypings>): void {
+	startGame(game: RockPaperScissorsGame): void {
 		throw new Error("Method not implemented.");
 	}
 
-	registerClient(game: AbstractGame<RpsMessageTypings>, ws: WebSocketClient): void {
+	registerClient(game: RockPaperScissorsGame, ws: WebSocketClient): void {
 		throw new Error("Method not implemented.");
 	}
 
-	endGame(game: AbstractGame<RpsMessageTypings>): void {
+	endGame(game: RockPaperScissorsGame): void {
 		throw new Error("Method not implemented.");
 	}
 }

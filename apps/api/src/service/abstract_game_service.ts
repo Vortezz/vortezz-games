@@ -1,16 +1,16 @@
 import { AbstractGame, CoreMessageTypings, WebSocketClient } from "@repo/shared";
 
-export default abstract class AbstractGameService<E extends CoreMessageTypings> {
+export default abstract class AbstractGameService<G extends AbstractGame<E>, E extends CoreMessageTypings> {
 
-	public startGame(game: AbstractGame<E>): void {
+	public startGame(game: G): void {
 		// game.startGame();
 
 		this.broadcast(game, "gameStarted");
 	}
 
-	abstract registerClient(game: AbstractGame<E>, ws: WebSocketClient): void;
+	abstract registerClient(game: G, ws: WebSocketClient): void;
 
-	public endGame(game: AbstractGame<E>): void {
+	public endGame(game: G): void {
 		// game.endGame();
 
 		this.broadcast(game, "gameEnded");

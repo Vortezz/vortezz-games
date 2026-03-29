@@ -1,6 +1,6 @@
-import { WebSocketClient } from "./websocket_client";
-import { CoreMessageTypings } from "../message/core_message_type";
-import { Room } from "./room";
+import { WebSocketClient } from "../websocket_client";
+import { CoreMessageTypings } from "../../message/core_message_type";
+import { Room } from "../room";
 
 export interface GamePlayer {
 	id: string;
