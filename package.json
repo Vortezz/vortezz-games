@@ -12,7 +12,7 @@
 		"turbo": "^2.8.20"
 	},
 	"name": "vortezz-games",
-	"packageManager": "yarn@1.22.22",
+	"packageManager": "pnpm@11.9.0",
 	"workspaces": [
 		"apps/*",
 		"packages/*"

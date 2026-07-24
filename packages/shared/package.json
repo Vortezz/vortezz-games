@@ -3,13 +3,14 @@
 	"version": "0.0.0",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
+	"type": "module",
 	"scripts": {
 		"build": "tsup",
 		"dev": "tsup",
 		"clean": "rm -rf dist"
 	},
 	"devDependencies": {
-		"@repo/typescript-config": "*",
+		"@repo/typescript-config": "workspace:*",
 		"@types/minimatch": "5.1.2",
 		"@types/react": "^18.2.14",
 		"tsup": "^8.0.1",

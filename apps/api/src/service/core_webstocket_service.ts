@@ -39,6 +39,7 @@ export default class CoreWebsocketService {
 			let room: Room | undefined;
 			if (action === "create") {
 				room = RoomsService.INSTANCE.createRoom(roomName ?? "", password);
+				console.log("Creating");
 			} else {
 				room = RoomsService.INSTANCE.getRoom(id ?? "");
 
@@ -47,21 +48,28 @@ export default class CoreWebsocketService {
 					console.log("Invalid pswd");
 					return;
 				}
+				console.log("Joining");
 			}
 
 			if (room === undefined) {
 				// TODO
 				console.log("No room");
+				ws.close(3000);
 				return;
 			}
 
+			console.log("Success");
+
 			// eslint-disable-next-line
 			// @ts-ignore
-			const wsClient = new WebSocketClient(ws, room);
+			const wsClient = new WebSocketClient(ws);
+			wsClient.setRoomId(room);
 
 			// TODO : Store WS
 
-			RoomsService.INSTANCE.registerPlayer(room, wsClient, name);
+			setTimeout(() => {
+				RoomsService.INSTANCE.registerPlayer(room, wsClient, name);
+			}, 100);
 
 			// TODO : Generate player id
 		});

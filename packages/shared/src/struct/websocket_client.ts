@@ -5,14 +5,13 @@ type Handler<K extends keyof E, E extends CoreMessageTypings> = (data: E[K]) => 
 export class WebSocketClient {
 
 	private readonly ws: WebSocket;
-	private game: string;
+	protected roomId: string | undefined;
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private callbacks = new Map<string, Handler<any, CoreMessageTypings>[]>();
 
-	public constructor(ws: WebSocket, game: string) {
+	public constructor(ws: WebSocket) {
 		this.ws = ws;
-		this.game = game;
 
 		ws.addEventListener("message", (message) => {
 			const json = JSON.parse(message.data, function (key, value) {
@@ -40,7 +39,12 @@ export class WebSocketClient {
 		});
 	}
 
+	public setRoomId(roomId: string): void {
+		this.roomId = roomId;
+	}
+
 	public send<E extends CoreMessageTypings, K extends keyof E>(key: K, data?: E[K]) {
+		console.log("Sending", key, data);
 		this.ws.send(JSON.stringify({
 			type: key,
 			data: data,

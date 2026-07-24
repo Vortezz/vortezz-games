@@ -20,7 +20,7 @@ export default class RoomsService {
 	}
 
 	public createRoom(name: string, password: string | null): Room {
-		const id = generateString(12); // TODO : Generate it
+		const id = generateString(4); // TODO : Generate it
 
 		const room = new Room(id, name, password);
 
@@ -31,6 +31,8 @@ export default class RoomsService {
 
 	public registerPlayer(room: Room, wsClient: WebSocketClient, name: string) {
 		// TODO : Prevent from using a name already used
+
+		const otherPlayers = room.getPlayers();
 
 		const isOwner = room.registerPlayer(name, wsClient, undefined, undefined);
 
@@ -43,6 +45,12 @@ export default class RoomsService {
 				// TODO
 			});
 		}
+
+		wsClient.on("ping", () => wsClient.send("pong"));
+
+		otherPlayers.forEach(player => player.ws?.send("playerJoined", room.getPlayers().pop()));
+
+		console.log("Registered");
 	}
 
 	private startGame(room: Room) {
