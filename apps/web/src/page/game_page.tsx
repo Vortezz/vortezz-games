@@ -2,6 +2,9 @@ import LayoutPage from "./layout_page";
 import { useContext } from "react";
 import { WebsocketContext } from "../context/websocket_context";
 import { Navigate } from "react-router-dom";
+import { GameLobby } from "../components/game/game_lobby";
+import { GamePlaying } from "../components/game/game_playing";
+import { GameEnded } from "../components/game/game_ended";
 
 export default function GamePage() {
 	const { websocket } = useContext(WebsocketContext);
@@ -10,15 +13,16 @@ export default function GamePage() {
 		return <Navigate to={"/"} />;
 	}
 
+	let gameComponent;
+	if (websocket.getGameStatus() === "lobby") {
+		gameComponent = <GameLobby />;
+	} else if (websocket.getGameStatus() === "playing") {
+		gameComponent = <GamePlaying />;
+	} else {
+		gameComponent = <GameEnded />;
+	}
+
 	return <LayoutPage>
-		<div>
-			<div>
-				<h3>Players</h3>
-				{websocket.getRoom()?.getPlayers().map((player, id) => {
-					return <div key={id}>{player.name}</div>;
-				})}
-			</div>
-			<div></div>
-		</div>
+		{gameComponent}
 	</LayoutPage>;
 };

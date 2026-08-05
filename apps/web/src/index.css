@@ -18,6 +18,10 @@
         @apply w-full outline-none text-gray-800 border rounded-sm px-4 py-2 bg-gray-50;
     }
 
+    select {
+        @apply w-full outline-none text-gray-800 border rounded-sm px-4 py-2 bg-gray-50;
+    }
+
     label {
         @apply leading-tight text-white;
     }

@@ -46,7 +46,7 @@ export default function JoinPage() {
 						password: password,
 					});
 				}}
-				className={"bg-lime-300 rounded-xl py-4 px-8 mx-auto mt-4 cursor-pointer disabled:bg-[#140033] disabled:cursor-default"}>Create game
+				className={"bg-lime-300 rounded-xl py-4 px-8 mx-auto mt-4 cursor-pointer disabled:bg-[#140033] disabled:cursor-default"}>Join game
 			</button>
 		</div>
 	</LayoutPage>;

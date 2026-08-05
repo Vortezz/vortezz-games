@@ -1,26 +1,26 @@
-import { AbstractGame, CoreMessageTypings, WebSocketClient } from "@repo/shared";
+import { CoreMessageTypings } from "@repo/shared";
+import { AbstractGame } from "../struct/game/abstract_game";
+import { WebSocketClient } from "../struct/websocket_client";
 
 export default abstract class AbstractGameService<G extends AbstractGame<E>, E extends CoreMessageTypings> {
 
 	public startGame(game: G): void {
-		// game.startGame();
+		game.getRoom().broadcast("gameStarted");
 
-		this.broadcast(game, "gameStarted");
+		setTimeout(() => {
+			game.startGame();
+		}, 100);
 	}
 
-	abstract registerClient(game: G, ws: WebSocketClient): void;
+	public registerClient(game: G, ws: WebSocketClient): void {
+		game.registerClient(ws);
+	}
 
 	public endGame(game: G): void {
-		// game.endGame();
+		game.getRoom().broadcast("gameEnded");
 
-		this.broadcast(game, "gameEnded");
-	}
-
-	public broadcast<K extends keyof E>(game: AbstractGame<CoreMessageTypings>, key: K, data?: E[K]): void {
-		for (const player of game.getRoom().getPlayers()) {
-			if (player.ws) {
-				player.ws.send(key, data);
-			}
-		}
+		setTimeout(() => {
+			game.endGame();
+		}, 100);
 	}
 }

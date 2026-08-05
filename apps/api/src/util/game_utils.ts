@@ -1,7 +1,7 @@
-import { CoreMessageTypings } from "../message/core_message_type";
-import { AbstractGame, DefaultGame, GameTypes } from "../struct/game/abstract_game";
-import { RockPaperScissorsGame } from "../struct/game/rps_game";
+import { AbstractGame, DefaultGame } from "../struct/game/abstract_game";
 import { Room } from "../struct/room";
+import { RockPaperScissorsGame } from "../struct/game/rps_game";
+import { CoreMessageTypings, GameTypes } from "@repo/shared";
 
 export function createGameType(room: Room, type: GameTypes): AbstractGame<CoreMessageTypings> {
 	let game;

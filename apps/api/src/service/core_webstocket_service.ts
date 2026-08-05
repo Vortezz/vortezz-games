@@ -1,6 +1,8 @@
 import { WebSocketServer } from "ws";
 import RoomsService from "./rooms_service";
-import { Room, WebSocketClient } from "@repo/shared";
+import { Room } from "../struct/room";
+import { WebSocketClient } from "../struct/websocket_client";
+import { generateString } from "../util/random_util";
 
 export default class CoreWebsocketService {
 
@@ -60,15 +62,16 @@ export default class CoreWebsocketService {
 
 			console.log("Success");
 
+			const clientId = generateString(10);
 			// eslint-disable-next-line
 			// @ts-ignore
-			const wsClient = new WebSocketClient(ws);
-			wsClient.setRoomId(room);
+			const wsClient = new WebSocketClient(ws, clientId);
+			wsClient.setRoomId(room.id);
 
 			// TODO : Store WS
 
 			setTimeout(() => {
-				RoomsService.INSTANCE.registerPlayer(room, wsClient, name);
+				RoomsService.INSTANCE.registerPlayer(room, wsClient, name, clientId);
 			}, 100);
 
 			// TODO : Generate player id

@@ -1,24 +1,44 @@
-import { GamePlayer, GameTypes } from "../struct/game/abstract_game";
-import { Room } from "../struct/room";
+import { GamePlayer, GameTypes } from "../struct/game";
+import { RoomTypings } from "../struct/room";
 
 interface CoreMessageTypings {
 	// Serverbound
 	pong: void;
-	roomData: Room;
+	roomData: RoomTypings;
 	playerJoined: GamePlayer,
 	playerLeft: GamePlayer,
 	gameStarted: void;
 	gameEnded: void;
+	settingsUpdated: Record<string, {
+		name: string;
+		type: string;
+		value: any;
+	}>;
+	setResults: {
+		id: string;
+		amount: number;
+		format: "points" | "duration";
+	}[];
+	self: string;
 
 	// Clientbound
 	ping: void;
 	startGame: void;
 	abortGame: void;
 	setType: GameTypes;
+	setSettings: Record<string, {
+		name: string;
+		type: string;
+		value: any;
+	}>;
+	resetGame: void;
 
 	// Both
-	// eslint-disable-next-line
-	gameEvent: any;
+	gameEvent: {
+		type: string;
+		// eslint-disable-next-line
+		data: any;
+	};
 }
 
 type CoreMessageType = keyof CoreMessageTypings;

@@ -1,8 +1,8 @@
-import { Context, createContext, useState } from "react";
-import WebSocketPlayer from "../ws/WebSocketPlayer";
+import { Context, createContext, useReducer, useState } from "react";
+import WebsocketPlayer from "../ws/websocket_player";
 
 export type WebsocketContextProps = {
-	websocket: undefined | WebSocketPlayer;
+	websocket: undefined | WebsocketPlayer;
 	createWebsocket: ({ name, roomName, id, password }: {
 		name: string,
 		roomName?: string
@@ -18,7 +18,8 @@ export const WebsocketContext: Context<WebsocketContextProps> = createContext<We
 });
 
 export function WebsocketProvider({ children }: { children: React.ReactNode }) {
-	const [ws, setWS] = useState<undefined | WebSocketPlayer>();
+	const [ws, setWS] = useState<undefined | WebsocketPlayer>();
+	const [, forceUpdate] = useReducer(x => x + 1, 0);
 
 	return <WebsocketContext.Provider value={{
 		websocket: ws,
@@ -30,7 +31,7 @@ export function WebsocketProvider({ children }: { children: React.ReactNode }) {
 				ws = new WebSocket(`ws://localhost:3000/?roomName=${roomName}&action=create&name=${name}${password ? `&password=${password}` : ""}`);
 			}
 
-			const wsPlayer = new WebSocketPlayer(ws);
+			const wsPlayer = new WebsocketPlayer(ws, forceUpdate);
 
 			setWS(wsPlayer);
 		},

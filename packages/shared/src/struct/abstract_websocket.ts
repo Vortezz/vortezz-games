@@ -2,9 +2,9 @@ import { CoreMessageTypings } from "../message/core_message_type";
 
 type Handler<K extends keyof E, E extends CoreMessageTypings> = (data: E[K]) => void;
 
-export class WebSocketClient {
+export class AbstractWebSocket {
 
-	private readonly ws: WebSocket;
+	protected readonly ws: WebSocket;
 	protected roomId: string | undefined;
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
