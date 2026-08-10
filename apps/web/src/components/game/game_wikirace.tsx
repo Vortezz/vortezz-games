@@ -2,6 +2,7 @@ import { AbstractGame, EventObject } from "./abstract_game";
 import { JSX } from "react";
 import { WikiRaceMessageTypings } from "@repo/shared/src/message/game/wikirace_message_type";
 import { ResultWikiRace } from "./wikirace/result_wikirace";
+import { TimerComponent } from "./parts/timer";
 
 interface WikiRaceTypings {
 	currentPage: string | undefined;
@@ -31,8 +32,9 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 		}
 
 		return <div className={"game-container bg-white"}>
+			<h3 className={"text-black flex"}>Get to {this.getGame().settings.endPage.value} -&nbsp;<TimerComponent startedAt={this.websocket.getGameStartedAt()} /></h3>
 			<div className={"wiki-wrapper"}>
-				<h1>{this.state.currentPage}</h1>
+				<h1 className={"mw-heading"}>{this.state.currentPage}</h1>
 				{this.state.currentPageContent ? <div className={"wiki-wrapper w-[calc(90%)]"}
 					onClick={e => {
 						e.preventDefault();
@@ -66,7 +68,7 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 	}
 
 	private changePage(title: string, skipWs?: boolean) {
-		if (title === "") {
+		if (title === "" || title.startsWith("File:")) {
 			return;
 		}
 

@@ -49,6 +49,10 @@ export class TimerComponent extends Component<TimerComponentProps> {
 			string += `${seconds}s`;
 		}
 
-		return <p>{string}</p>;
+		if (string === "") {
+			string = "0s";
+		}
+
+		return <span>{string}</span>;
 	}
 }
