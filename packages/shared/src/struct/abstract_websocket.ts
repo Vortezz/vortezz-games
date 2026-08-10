@@ -14,7 +14,7 @@ export class AbstractWebSocket {
 		this.ws = ws;
 
 		ws.addEventListener("message", (message) => {
-			const json = JSON.parse(message.data, function (key, value) {
+			const json = JSON.parse(message.data, function (_key, value) {
 				if (typeof value === "object" && value !== null) {
 					if (value.objectType === "map") {
 						return new Map(value.value);
@@ -34,6 +34,7 @@ export class AbstractWebSocket {
 			const handlers = this.callbacks.get(type);
 
 			if (handlers) {
+				// @ts-ignore
 				handlers.forEach((handler) => handler(data));
 			}
 		});

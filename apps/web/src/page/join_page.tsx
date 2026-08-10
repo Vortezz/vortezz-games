@@ -14,6 +14,7 @@ export default function JoinPage() {
 	const id = searchParams.get("id") ?? "";
 
 	const [name, setName] = useState("");
+	// @ts-ignore
 	const [needsPassword, setNeedsPassword] = useState(false);
 	const [password, setPassword] = useState<undefined | string>(undefined);
 

@@ -74,7 +74,9 @@ export function ResultWikiRace({ paths }: { paths: { id: string, pages: string[]
 				.attr("fill", "black");
 		}
 
+		// @ts-ignore
 		const simulation = d3.forceSimulation(allPages)
+			// @ts-ignore
 			.force("link", d3.forceLink(allLinks).id(d => d.id).distance(125 - 7.5 * Math.sqrt(allLinks.length)))
 			.force("charge", d3.forceManyBody())
 			.force("center", d3.forceCenter(width / 2, height / 2))
@@ -82,7 +84,6 @@ export function ResultWikiRace({ paths }: { paths: { id: string, pages: string[]
 
 		const link = svg.append("g")
 			.attr("stroke", "#000")
-			// .attr("stroke-opacity", 0.6)
 			.selectAll()
 			.data(allLinks)
 			.join("line")
@@ -117,7 +118,7 @@ export function ResultWikiRace({ paths }: { paths: { id: string, pages: string[]
 		node.append("title")
 			.text(d => d.id);
 
-		// Add a drag behavior.
+		// @ts-ignore
 		node.call(d3.drag()
 			.on("start", dragstarted)
 			.on("drag", dragged)
@@ -125,28 +126,34 @@ export function ResultWikiRace({ paths }: { paths: { id: string, pages: string[]
 
 		function ticked() {
 			link
+				// @ts-ignore
 				.attr("x1", d => d.source.x)
+				// @ts-ignore
 				.attr("y1", d => d.source.y)
+				// @ts-ignore
 				.attr("x2", d => d.target.x)
+				// @ts-ignore
 				.attr("y2", d => d.target.y);
 
 			node
+				// @ts-ignore
 				.attr("cx", d => d.x)
+				// @ts-ignore
 				.attr("cy", d => d.y);
 		}
 
-		function dragstarted(event) {
+		function dragstarted(event: any) {
 			if (!event.active) simulation.alphaTarget(0.3).restart();
 			event.subject.fx = event.subject.x;
 			event.subject.fy = event.subject.y;
 		}
 
-		function dragged(event) {
+		function dragged(event: any) {
 			event.subject.fx = event.x;
 			event.subject.fy = event.y;
 		}
 
-		function dragended(event) {
+		function dragended(event: any) {
 			if (!event.active) simulation.alphaTarget(0);
 			event.subject.fx = null;
 			event.subject.fy = null;

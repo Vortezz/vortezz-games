@@ -1,5 +1,4 @@
 import { RoomTypings } from "./room";
-import { CoreMessageTypings } from "../message/core_message_type";
 import { AbstractWebSocket } from "./abstract_websocket";
 
 export interface GamePlayer {
@@ -13,7 +12,7 @@ export interface Events {
 	playerAdded: GamePlayer;
 }
 
-export interface GameTypings<E extends CoreMessageTypings> {
+export interface GameTypings {
 	type: GameTypes;
 	room: RoomTypings;
 	settings: Record<string, {

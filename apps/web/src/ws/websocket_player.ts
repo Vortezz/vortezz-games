@@ -6,7 +6,7 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 	private readonly forceUpdate: () => void;
 	private room: RoomTypings | undefined;
 	private gameStatus: "lobby" | "playing" | "results" = "lobby";
-	private playerId: string;
+	private playerId: string | undefined;
 
 	private gameEventHandler: ((data: {
 		type: string;
@@ -115,6 +115,7 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 	}
 
 	public sendGame<E extends CoreMessageTypings, K extends keyof E>(key: K, data?: E[K]) {
+		// @ts-ignore
 		this.send("gameEvent", { type: key, data });
 	}
 }

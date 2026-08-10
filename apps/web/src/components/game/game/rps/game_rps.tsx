@@ -13,6 +13,7 @@ export function GameRockPaperScissors() {
 
 	const [playable, setPlayable] = useState(false);
 	const [result, setResult] = useState<{ winner: string | undefined, picks: Map<string, RpsPossibilites> } | undefined>();
+	// @ts-ignore
 	const [score, setScore] = useState<Map<string, number>>(new Map()); // TODO : Score feedback
 	const [pick, setPick] = useState<RpsPossibilites | undefined>();
 
