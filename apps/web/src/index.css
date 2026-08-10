@@ -89,7 +89,7 @@ body {
         display: inline !important
     }
 
-    .hatnote, .reference, .mw-editsection, .noprint, .mw-references-wrap, #External_links, #References {
+    .reference, .mw-editsection, .noprint, .mw-references-wrap, #External_links, #References {
         display: none
     }
 

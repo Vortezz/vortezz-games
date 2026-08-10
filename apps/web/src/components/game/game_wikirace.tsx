@@ -41,6 +41,10 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 							return;
 						}
 
+						if (!e.target.href.includes(window.location.origin)) {
+							return;
+						}
+
 						this.changePage(e.target.title);
 					}}
 					dangerouslySetInnerHTML={{ __html: this.state.currentPageContent }} /> : <p>Loading...</p>}
@@ -62,6 +66,10 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 	}
 
 	private changePage(title: string, skipWs?: boolean) {
+		if (title === "") {
+			return;
+		}
+
 		this.setState({
 			currentPage: title,
 			currentPageContent: undefined,
