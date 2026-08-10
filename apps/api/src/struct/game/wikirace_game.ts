@@ -29,8 +29,6 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 
 	public handleGameEvent(wsClient: WebSocketClient, data: { type: string, data: any }) {
 		if (data.type === "changePage") {
-			console.log("changePage " + JSON.stringify(data.data));
-			console.log(this.pathsTaken);
 			const id = wsClient.getId();
 
 			if (this.finishedAt.has(id)) {
@@ -57,7 +55,8 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 			}
 
 			if (this.settings.endPage.value === page) {
-				this.finishedAt.set(id, Date.now());
+				const finishedAt = Date.now();
+				this.finishedAt.set(id, finishedAt);
 
 				wsClient.send("gameEvent", {
 					type: "currentPaths",
@@ -65,6 +64,11 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 						id: item[0],
 						pages: item[1],
 					})),
+				});
+
+				this.broadcast("gameFinished", {
+					id: id,
+					finishedAt: finishedAt,
 				});
 			}
 

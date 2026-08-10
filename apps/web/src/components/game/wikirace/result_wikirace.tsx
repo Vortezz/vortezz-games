@@ -1,8 +1,16 @@
 import * as d3 from "d3";
 import { useEffect, useRef } from "react";
 import { GamePlayer } from "@repo/shared";
+import { TimerComponent } from "../parts/timer";
 
-export function ResultWikiRace({ paths, startPage, endPage, players }: { paths: { id: string, pages: string[] }[], startPage: string, endPage: string, players: Map<string, GamePlayer> }) {
+export function ResultWikiRace({ paths, startPage, endPage, players, finishedAt, startedAt }: {
+	paths: { id: string, pages: string[] }[],
+	startPage: string,
+	endPage: string,
+	players: Map<string, GamePlayer>,
+	finishedAt: Map<string, number>,
+	startedAt: number,
+}) {
 	const ref = useRef<SVGSVGElement>(null);
 
 	useEffect(() => {
@@ -159,20 +167,20 @@ export function ResultWikiRace({ paths, startPage, endPage, players }: { paths: 
 			<thead className={"border-b-white border-b"}>
 			<tr>
 				<th className={"w-48"}>Name</th>
-				<th className={"w-24"}>Timer</th>
-				<th className={"w-24"}>Clics</th>
+				<th className={"w-28"}>Timer</th>
+				<th className={"w-20"}>Clics</th>
 				<th className={"w-[calc(100%-24rem)]"}>Pages visited</th>
 			</tr>
 			</thead>
 			<tbody>
-
-			</tbody>
 			{paths.map((path) => <tr>
 				<td>{players.get(path.id)!.name}</td>
-				<td>?</td>
+				<td><TimerComponent startedAt={startedAt}
+					finishedAt={finishedAt.get(path.id)} /></td>
 				<td>{path.pages.length}</td>
 				<td>{path.pages.join(" → ")}</td>
 			</tr>)}
+			</tbody>
 		</table>
 		<h3 className={"mt-8"}>Pages graph</h3>
 		<svg

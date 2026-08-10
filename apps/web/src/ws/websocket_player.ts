@@ -6,6 +6,7 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 	private readonly forceUpdate: () => void;
 	private room: RoomTypings | undefined;
 	private gameStatus: "lobby" | "playing" | "results" = "lobby";
+	private gameStartedAt: number = 0;
 	private playerId: string | undefined;
 
 	private gameEventHandler: ((data: {
@@ -64,6 +65,7 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 
 		this.on("gameStarted", () => {
 			this.gameStatus = "playing";
+			this.gameStartedAt = Date.now();
 
 			if (this.gameEventHandler) {
 				this.gameEventHandler({
@@ -112,6 +114,10 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 
 	public isRoomOwner() {
 		return this.playerId !== undefined && this.room !== undefined && this.room.players.get(this.playerId)!.owner;
+	}
+
+	public getGameStartedAt() {
+		return this.gameStartedAt;
 	}
 
 	public setGameEventHandler(handler: ((data: {

@@ -4,7 +4,7 @@ import { WebSocketClient } from "../websocket_client";
 
 type Handler<E extends keyof Events> = (data: Events[E]) => void;
 
-export abstract class AbstractGame<E extends CoreMessageTypings> implements GameTypings<E> {
+export abstract class AbstractGame<E extends CoreMessageTypings> implements GameTypings {
 
 	readonly type: GameTypes;
 	settings: any;
@@ -46,7 +46,7 @@ export abstract class AbstractGame<E extends CoreMessageTypings> implements Game
 	}
 
 	public broadcast<K extends keyof E>(key: K, data?: E[K]) {
-		this.getRoom().broadcast("gameEvent", { type: key, data });
+		this.getRoom().broadcast("gameEvent", { type: key as string, data });
 	}
 
 	public handleGameEvent(wsClient: WebSocketClient, data: { type: string, data: any }) {

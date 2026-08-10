@@ -7,6 +7,7 @@ interface WikiRaceTypings {
 	currentPage: string | undefined;
 	currentPageContent: string | undefined;
 	finished: boolean;
+	finishedAt: Map<string, number>;
 	paths: { id: string, pages: string[] }[];
 }
 
@@ -14,22 +15,18 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 
 	constructor(props: any) {
 		super(props);
-
-		this.state = {
-			currentPage: undefined,
-			currentPageContent: undefined,
-			finished: false,
-			paths: [],
-		};
 	}
 
 	public renderPlaying(): JSX.Element {
 		if (this.state.finished) {
 			return <div className={"game-container gradient-reverse"}>
+				<h3>Pending results...</h3>
 				<ResultWikiRace paths={this.state.paths}
 					startPage={this.getGame().settings.startPage.value}
 					endPage={this.getGame().settings.endPage.value}
-					players={this.getRoom().players} />
+					players={this.getRoom().players}
+					finishedAt={this.state.finishedAt}
+					startedAt={this.websocket.getGameStartedAt()} />
 			</div>;
 		}
 
@@ -57,7 +54,9 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 			<ResultWikiRace paths={this.state.paths}
 				startPage={this.getGame().settings.startPage.value}
 				endPage={this.getGame().settings.endPage.value}
-				players={this.getRoom().players} />
+				players={this.getRoom().players}
+				finishedAt={this.state.finishedAt}
+				startedAt={this.websocket.getGameStartedAt()} />
 			{this.getLobbyButton()}
 		</div>;
 	}
@@ -103,10 +102,26 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 					paths: oldPaths,
 				};
 			});
+		} else if (event.type === "gameFinished") {
+			this.setState(oldState => {
+				oldState.finishedAt.set(event.data.id, event.data.finishedAt);
+
+				return { finishedAt: new Map(oldState.finishedAt) };
+			});
 		}
 	}
 
 	protected onStart() {
 		this.changePage(this.getGame().settings.startPage.value, true);
+	}
+
+	protected getDefaultState(): WikiRaceTypings {
+		return {
+			currentPage: undefined,
+			currentPageContent: undefined,
+			finished: false,
+			finishedAt: new Map(),
+			paths: [],
+		};
 	}
 }

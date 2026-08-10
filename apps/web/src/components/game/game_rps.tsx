@@ -19,13 +19,6 @@ export class RockPaperScissorsGame extends AbstractGame<RpsMessageTypings, RpsSt
 
 	constructor(props: any) {
 		super(props);
-
-		this.state = {
-			playable: true,
-			result: undefined,
-			score: new Map(),
-			pick: undefined,
-		};
 	}
 
 	public renderPlaying(): JSX.Element {
@@ -92,5 +85,14 @@ export class RockPaperScissorsGame extends AbstractGame<RpsMessageTypings, RpsSt
 				result: event.data,
 			});
 		}
+	}
+
+	protected getDefaultState() {
+		return {
+			playable: true,
+			result: undefined,
+			score: new Map(),
+			pick: undefined,
+		};
 	}
 }

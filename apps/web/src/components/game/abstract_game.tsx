@@ -17,6 +17,8 @@ export abstract class AbstractGame<MessageTypings extends CoreMessageTypings, IS
 
 	protected constructor(props: any) {
 		super(props);
+
+		this.state = this.getDefaultState();
 	}
 
 	public componentDidMount() {
@@ -81,14 +83,10 @@ export abstract class AbstractGame<MessageTypings extends CoreMessageTypings, IS
 				if (this.websocket.isRoomOwner()) {
 					this.websocket.send("resetGame");
 				}
+
+				this.setState(this.getDefaultState());
 			}}>Back to lobby
 		</button>;
-	}
-
-	protected abstract handleData(event: EventObject<MessageTypings>): void;
-
-	protected onStart() {
-		// to override
 	}
 
 	protected sendGame<K extends keyof MessageTypings>(key: K, data?: MessageTypings[K]) {
@@ -102,4 +100,12 @@ export abstract class AbstractGame<MessageTypings extends CoreMessageTypings, IS
 	protected getGame() {
 		return this.websocket.getRoom()!.game;
 	}
+
+	protected onStart() {
+		// to override
+	}
+
+	protected abstract handleData(event: EventObject<MessageTypings>): void;
+
+	protected abstract getDefaultState(): IState;
 }
