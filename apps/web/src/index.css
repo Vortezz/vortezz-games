@@ -35,6 +35,14 @@ body {
     font-family: "Unbounded", sans-serif;
 }
 
+.game-container {
+    @apply flex flex-col p-8 border border-gray-800 rounded-xl gap-4 w-240 max-w-[90%] items-center m-auto;
+}
+
+.gradient-reverse {
+    background: linear-gradient(270deg, #230058 0%, #140033 48.56%, #0E0023 100%)
+}
+
 .wiki-wrapper {
     width: 100%;
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;

@@ -1,4 +1,4 @@
-import { AbstractWebSocket, CoreMessageTypings, RoomTypings } from "@repo/shared";
+import { AbstractWebSocket, RoomTypings } from "@repo/shared";
 import { router } from "../router";
 
 export default class WebsocketPlayer extends AbstractWebSocket {
@@ -65,6 +65,13 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 		this.on("gameStarted", () => {
 			this.gameStatus = "playing";
 
+			if (this.gameEventHandler) {
+				this.gameEventHandler({
+					type: "gameStarted",
+					data: undefined,
+				});
+			}
+
 			this.forceUpdate();
 		});
 
@@ -112,10 +119,5 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 		data: any
 	}) => void) | undefined) {
 		this.gameEventHandler = handler;
-	}
-
-	public sendGame<E extends CoreMessageTypings, K extends keyof E>(key: K, data?: E[K]) {
-		// @ts-ignore
-		this.send("gameEvent", { type: key, data });
 	}
 }

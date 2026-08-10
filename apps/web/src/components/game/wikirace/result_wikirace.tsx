@@ -1,10 +1,8 @@
 import * as d3 from "d3";
-import { useContext, useEffect, useRef } from "react";
-import { WebsocketContext } from "../../../../context/websocket_context";
+import { useEffect, useRef } from "react";
+import { GamePlayer } from "@repo/shared";
 
-export function ResultWikiRace({ paths }: { paths: { id: string, pages: string[] }[] }) {
-	const { websocket } = useContext(WebsocketContext);
-
+export function ResultWikiRace({ paths, startPage, endPage, players }: { paths: { id: string, pages: string[] }[], startPage: string, endPage: string, players: Map<string, GamePlayer> }) {
 	const ref = useRef<SVGSVGElement>(null);
 
 	useEffect(() => {
@@ -43,8 +41,6 @@ export function ResultWikiRace({ paths }: { paths: { id: string, pages: string[]
 			}
 		}
 
-		console.log(allLinksMap);
-
 		const allLinks = [...allLinksMap.entries()].map((item) => {
 			const splitted = item[0].split("||||");
 
@@ -54,8 +50,6 @@ export function ResultWikiRace({ paths }: { paths: { id: string, pages: string[]
 				value: item[1],
 			});
 		});
-
-		console.log(allLinks);
 
 		const allArrowSizes = new Set(allLinks.map(item => item.value));
 
@@ -71,7 +65,7 @@ export function ResultWikiRace({ paths }: { paths: { id: string, pages: string[]
 				.attr("refY", "2")
 				.insert("path")
 				.attr("d", "M0,0 V4 L2,2 Z")
-				.attr("fill", "black");
+				.attr("fill", "white");
 		}
 
 		// @ts-ignore
@@ -83,7 +77,7 @@ export function ResultWikiRace({ paths }: { paths: { id: string, pages: string[]
 			.on("tick", ticked);
 
 		const link = svg.append("g")
-			.attr("stroke", "#000")
+			.attr("stroke", "#fff")
 			.selectAll()
 			.data(allLinks)
 			.join("line")
@@ -97,18 +91,18 @@ export function ResultWikiRace({ paths }: { paths: { id: string, pages: string[]
 			.join("circle")
 			.attr("r", 10)
 			.attr("stroke", d => {
-				if (websocket?.getRoom()!.game.settings.startPage.value === d.id) {
+				if (startPage === d.id) {
 					return "#0b0";
-				} else if (websocket?.getRoom()!.game.settings.endPage.value === d.id) {
+				} else if (endPage === d.id) {
 					return "#b00";
 				} else {
 					return "#00b";
 				}
 			})
 			.attr("fill", d => {
-				if (websocket?.getRoom()!.game.settings.startPage.value === d.id) {
+				if (startPage === d.id) {
 					return "#0f0";
-				} else if (websocket?.getRoom()!.game.settings.endPage.value === d.id) {
+				} else if (endPage === d.id) {
 					return "#f00";
 				} else {
 					return "#00f";
@@ -160,20 +154,42 @@ export function ResultWikiRace({ paths }: { paths: { id: string, pages: string[]
 		}
 	}, [paths]);
 
-	return <svg
-		ref={ref}>
-		<defs>
-			<marker
-				id="head"
-				orient="auto"
-				markerWidth="3"
-				markerHeight="4"
-				refX="5"
-				refY="2"
-			>
-				<path d="M0,0 V4 L2,2 Z"
-					fill="black" />
-			</marker>
-		</defs>
-	</svg>;
+	return <>
+		<table className={"text-white w-full text-left"}>
+			<thead className={"border-b-white border-b"}>
+			<tr>
+				<th className={"w-48"}>Name</th>
+				<th className={"w-24"}>Timer</th>
+				<th className={"w-24"}>Clics</th>
+				<th className={"w-[calc(100%-24rem)]"}>Pages visited</th>
+			</tr>
+			</thead>
+			<tbody>
+
+			</tbody>
+			{paths.map((path) => <tr>
+				<td>{players.get(path.id)!.name}</td>
+				<td>?</td>
+				<td>{path.pages.length}</td>
+				<td>{path.pages.join(" → ")}</td>
+			</tr>)}
+		</table>
+		<h3 className={"mt-8"}>Pages graph</h3>
+		<svg
+			ref={ref}>
+			<defs>
+				<marker
+					id="head"
+					orient="auto"
+					markerWidth="3"
+					markerHeight="4"
+					refX="5"
+					refY="2"
+				>
+					<path d="M0,0 V4 L2,2 Z"
+						fill="black" />
+				</marker>
+			</defs>
+		</svg>
+	</>;
 }

@@ -1,7 +1,7 @@
 import { useContext } from "react";
-import { WebsocketContext } from "../../context/websocket_context";
+import { WebsocketContext } from "../../../context/websocket_context";
 import { AvailableGames, GameTypes } from "@repo/shared/src/struct/game";
-import { WikipediaPageInput } from "../input/wikipedia_page_input";
+import { WikipediaPageInput } from "../../input/wikipedia_page_input";
 
 export function GameLobby() {
 	const { websocket } = useContext(WebsocketContext);
@@ -10,10 +10,7 @@ export function GameLobby() {
 		return <></>;
 	}
 
-	return <div className={"flex flex-col p-8 border border-gray-800 rounded-xl gap-4 w-240 max-w-[90%] m-auto"}
-		style={{
-			background: "linear-gradient(270deg, #230058 0%, #140033 48.56%, #0E0023 100%)",
-		}}>
+	return <div className={"game-container gradient-reverse"}>
 		<h1>Room code: {websocket.getRoom()?.id}</h1>
 		<hr className={"text-[#676767]"} />
 		<div className={"flex mx-auto w-240 gap-8"}>
@@ -56,7 +53,8 @@ export function GameLobby() {
 								settings.value = value;
 
 								websocket.send("setSettings", websocket?.getRoom()?.game.settings);
-							}} disabled={!websocket.isRoomOwner()} />;
+							}}
+							disabled={!websocket.isRoomOwner()} />;
 					} else {
 						settingInput = <input type={settings.type}
 							disabled={!websocket.isRoomOwner()}

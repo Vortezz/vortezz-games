@@ -2,9 +2,8 @@ import LayoutPage from "./layout_page";
 import { useContext } from "react";
 import { WebsocketContext } from "../context/websocket_context";
 import { Navigate } from "react-router-dom";
-import { GameLobby } from "../components/game/game_lobby";
-import { GamePlaying } from "../components/game/game_playing";
-import { GameEnded } from "../components/game/game_ended";
+import { RockPaperScissorsGame } from "../components/game/game_rps";
+import { WikiRaceGame } from "../components/game/game_wikirace";
 
 export default function GamePage() {
 	const { websocket } = useContext(WebsocketContext);
@@ -14,13 +13,12 @@ export default function GamePage() {
 	}
 
 	let gameComponent;
-	console.log(websocket.getGameStatus());
-	if (websocket.getGameStatus() === "lobby") {
-		gameComponent = <GameLobby />;
-	} else if (websocket.getGameStatus() === "playing") {
-		gameComponent = <GamePlaying />;
+	if (websocket.getRoom()!.game.type === "rps") {
+		gameComponent = <RockPaperScissorsGame />;
+	} else if (websocket.getRoom()!.game.type === "wikirace") {
+		gameComponent = <WikiRaceGame />;
 	} else {
-		gameComponent = <GameEnded />;
+		gameComponent = <></>;
 	}
 
 	return <LayoutPage>
