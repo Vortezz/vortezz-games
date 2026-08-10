@@ -52,11 +52,27 @@ export const AvailableGames: Record<string, AvailableGamesType> = {
 			},
 		},
 	},
-	"default": {
-		name: "Default",
+	"wikirace": {
+		name: "WikiRace",
 		minPlayers: 1,
 		maxPlayers: 64,
-		settings: {},
+		settings: {
+			language: {
+				value: "en",
+				name: "Language",
+				type: "wikilanguage",
+			},
+			startPage: {
+				value: "",
+				name: "Start page",
+				type: "wikipage",
+			},
+			endPage: {
+				value: "",
+				name: "End page",
+				type: "wikipage",
+			},
+		},
 	},
 };
 

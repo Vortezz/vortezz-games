@@ -31,6 +31,65 @@
     }
 }
 
-* {
+body {
     font-family: "Unbounded", sans-serif;
+}
+
+.wiki-wrapper {
+    width: 100%;
+    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+    white-space: normal;
+    padding-bottom: 50px;
+    word-wrap: break-word;
+
+    p, h1, h2, h3 {
+        margin: 0.5em 0;
+        color: #202122;
+        line-height: 1.65;
+    }
+
+    a {
+        color: #36c;
+        text-decoration: none;
+        background: none;
+    }
+
+    .infobox {
+        font-size: 90%;
+        position: relative;
+        border: 1px solid #eaecf0;
+        margin-bottom: 2em;
+        background-color: #f8f9fa;
+        display: flex;
+        flex: 1 1 100%;
+        flex-flow: column nowrap;
+    }
+
+    .mw-heading {
+        font-family: Linux Libertine, Georgia, Times, "Source Serif Pro", serif;
+        font-weight: normal;
+        border-bottom: 1px solid #a2a9b1;
+        margin-bottom: .5em;
+    }
+
+    .mw-heading > h1, h2, h3, h4 {
+        border-bottom: 0;
+        font-size: 1.5em;
+    }
+
+    .wiki-wrapper .tocnumber {
+        display: inline !important
+    }
+
+    .hatnote, .reference, .mw-editsection, .noprint, .mw-references-wrap, #External_links, #References {
+        display: none
+    }
+
+    .wiki-wrapper .toc {
+        display: table !important
+    }
+
+    .wiki-wrapper a:visited {
+        color: #36c !important
+    }
 }

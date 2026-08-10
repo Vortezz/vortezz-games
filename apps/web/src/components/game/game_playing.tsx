@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { WebsocketContext } from "../../context/websocket_context";
-import { GameRockPaperScissors } from "./game/game_rps";
+import { GameRockPaperScissors } from "./game/rps/game_rps";
+import { WikiRaceGame } from "./game/wikirace/game_wikirace";
 
 export function GamePlaying() {
 	const { websocket } = useContext(WebsocketContext);
@@ -14,6 +15,15 @@ export function GamePlaying() {
 			style={{
 				background: "linear-gradient(270deg, #230058 0%, #140033 48.56%, #0E0023 100%)",
 			}}><GameRockPaperScissors />
+		</div>;
+	}
+
+	if (websocket.getRoom()?.game.type === "wikirace") {
+		return <div className={"flex flex-col p-8 border border-gray-800 rounded-xl gap-4 w-240 max-w-[90%] m-auto items-center"}
+			style={{
+				background: "white",
+			}}>
+			<WikiRaceGame />
 		</div>;
 	}
 

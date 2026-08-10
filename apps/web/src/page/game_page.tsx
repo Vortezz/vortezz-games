@@ -14,6 +14,7 @@ export default function GamePage() {
 	}
 
 	let gameComponent;
+	console.log(websocket.getGameStatus());
 	if (websocket.getGameStatus() === "lobby") {
 		gameComponent = <GameLobby />;
 	} else if (websocket.getGameStatus() === "playing") {

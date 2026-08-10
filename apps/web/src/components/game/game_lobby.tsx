@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { WebsocketContext } from "../../context/websocket_context";
 import { AvailableGames, GameTypes } from "@repo/shared/src/struct/game";
+import { WikipediaPageInput } from "../input/wikipedia_page_input";
 
 export function GameLobby() {
 	const { websocket } = useContext(WebsocketContext);
@@ -47,9 +48,17 @@ export function GameLobby() {
 					})}
 				</select>
 				{Object.entries(websocket?.getRoom()?.game.settings ?? {}).map(([id, settings]) => {
-					return <div className={"mt-4"}>
-						<label htmlFor={id}>{settings.name}</label>
-						<input type={settings.type}
+					let settingInput: JSX.Element;
+
+					if (settings.type === "wikipage") {
+						settingInput = <WikipediaPageInput value={settings.value}
+							setValue={(value) => {
+								settings.value = value;
+
+								websocket.send("setSettings", websocket?.getRoom()?.game.settings);
+							}} disabled={!websocket.isRoomOwner()} />;
+					} else {
+						settingInput = <input type={settings.type}
 							disabled={!websocket.isRoomOwner()}
 							value={settings.value}
 							onChange={(e) => {
@@ -63,7 +72,12 @@ export function GameLobby() {
 								}
 
 								websocket.send("setSettings", websocket?.getRoom()?.game.settings);
-							}} />
+							}} />;
+					}
+
+					return <div className={"mt-4"}>
+						<label htmlFor={id}>{settings.name}</label>
+						{settingInput}
 					</div>;
 				})}
 			</div>

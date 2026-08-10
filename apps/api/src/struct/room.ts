@@ -35,6 +35,8 @@ export class Room implements RoomTypings {
 	}
 
 	public registerPlayer(name: string, ws: WebSocketClient | undefined, id: string | undefined, owner: boolean | undefined): boolean {
+		// TODO : Prevent registration if game is pending
+
 		let realId = id;
 		if (realId === undefined) {
 			realId = generateString(10);
@@ -80,7 +82,7 @@ export class Room implements RoomTypings {
 	}
 
 	public handleGameEvent(wsClient: WebSocketClient, data: { type: string, data: any }) {
-		if (this.game) {
+		if (this.game && this.game.isGameStarted()) {
 			this.game.handleGameEvent(wsClient, data);
 		}
 	}

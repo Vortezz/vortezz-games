@@ -14,7 +14,6 @@ export class RockPaperScissorsGame extends AbstractGame<RpsMessageTypings> {
 	}
 
 	public play(player: string, pick: RpsPossibilites) {
-		console.log("Played");
 		if (!this.playable) {
 			return;
 		}
@@ -80,11 +79,13 @@ export class RockPaperScissorsGame extends AbstractGame<RpsMessageTypings> {
 	}
 
 	public startGame() {
+		super.startGame();
+
 		this.playable = true;
 		this.broadcast("playable", true);
 	}
 
-	public setupPlayer(ws: WebSocketClient) {
+	public registerClient(ws: WebSocketClient) {
 		this.scores.set(ws.getId(), 0);
 	}
 

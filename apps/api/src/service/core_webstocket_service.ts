@@ -22,7 +22,7 @@ export default class CoreWebsocketService {
 			console.log(`Websocket connection connected: ${ws}`);
 			const urlSearchParams = new URLSearchParams(req.url?.split("?").slice(1).join("?"));
 
-			const id = urlSearchParams.get("id"); // TODO : Action to create game
+			const id = urlSearchParams.get("id");
 			const name = urlSearchParams.get("name");
 			const roomName = urlSearchParams.get("roomName");
 			const password = urlSearchParams.get("password");
@@ -73,8 +73,6 @@ export default class CoreWebsocketService {
 			setTimeout(() => {
 				RoomsService.INSTANCE.registerPlayer(room, wsClient, name, clientId);
 			}, 100);
-
-			// TODO : Generate player id
 		});
 	}
 }

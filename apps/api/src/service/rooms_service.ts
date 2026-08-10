@@ -1,17 +1,14 @@
-import { CoreMessageTypings, GameTypes } from "@repo/shared";
-import RockPaperScissorsGameService from "./game/rps_game_service";
-import AbstractGameService from "./abstract_game_service";
-import DefaultGameService from "./game/default_game_service";
-import { AbstractGame, DefaultGame } from "../struct/game/abstract_game";
+import { GameTypes } from "@repo/shared";
 import { Room } from "../struct/room";
 import { generateString } from "../util/random_util";
 import { WebSocketClient } from "../struct/websocket_client";
 import { RockPaperScissorsGame } from "../struct/game/rps_game";
+import { WikiRaceGame } from "../struct/game/wikirace_game";
 
 function createGame(type: GameTypes, room: Room) {
 	switch (type) {
-		case "default":
-			room.game = new DefaultGame(room);
+		case "wikirace":
+			room.game = new WikiRaceGame(room);
 			break;
 		case "rps":
 			room.game = new RockPaperScissorsGame(room);
@@ -23,12 +20,9 @@ export default class RoomsService {
 
 	public static INSTANCE: RoomsService = new RoomsService();
 
-	private availableGameServices = new Map<GameTypes, AbstractGameService<AbstractGame<CoreMessageTypings>, CoreMessageTypings>>();
 	private currentRooms = new Map<string, Room>();
 
 	public initialize() {
-		this.availableGameServices.set("rps", new RockPaperScissorsGameService());
-		this.availableGameServices.set("default", new DefaultGameService());
 	}
 
 	public getRoom(id: string): Room | undefined {
@@ -36,7 +30,7 @@ export default class RoomsService {
 	}
 
 	public createRoom(name: string, password: string | null): Room {
-		const id = generateString(4); // TODO : Generate it
+		const id = generateString(4);
 
 		const room = new Room(id, name, password);
 
@@ -86,6 +80,8 @@ export default class RoomsService {
 
 		otherPlayers.forEach(player => player.ws?.send("playerJoined", room.getPlayers().pop()));
 
+		room.game.registerClient(wsClient);
+
 		console.log("Registered");
 	}
 
@@ -97,14 +93,10 @@ export default class RoomsService {
 			return;
 		}
 
-		const gameService = this.availableGameServices.get(game.getType());
+		game.room.broadcast("gameStarted");
 
-		console.log("Starting game", game);
-		if (gameService === undefined) {
-			// TODO : Send error
-			return;
-		}
-
-		gameService.startGame(game);
+		setTimeout(() => {
+			game.startGame();
+		}, 100);
 	}
 }

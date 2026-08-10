@@ -11,11 +11,6 @@ export abstract class AbstractGame<E extends CoreMessageTypings> implements Game
 	readonly room: Room;
 	results = undefined;
 
-	// TODO : Add handlers
-
-	// eslint-disable-next-line
-	private readonly handlers: Map<keyof Events, Handler<any>> = new Map<keyof Events, Handler<any>>();
-
 	private isStarted = false;
 
 	protected constructor(room: Room, type: GameTypes) {
@@ -25,6 +20,8 @@ export abstract class AbstractGame<E extends CoreMessageTypings> implements Game
 	}
 
 	public startGame() {
+		this.isStarted = true;
+
 		// to be overridden
 	}
 
@@ -42,6 +39,10 @@ export abstract class AbstractGame<E extends CoreMessageTypings> implements Game
 
 	public getRoom() {
 		return this.room;
+	}
+
+	public isGameStarted() {
+		return this.isStarted;
 	}
 
 	public broadcast<K extends keyof E>(key: K, data?: E[K]) {

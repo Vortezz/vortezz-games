@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { RpsMessageTypings, RpsPossibilites } from "@repo/shared";
-import { WebsocketContext } from "../../../context/websocket_context";
+import { WebsocketContext } from "../../../../context/websocket_context";
 
 const POSSIBILITY_TO_EMOJI = {
 	"rock": "🪨",
@@ -13,7 +13,7 @@ export function GameRockPaperScissors() {
 
 	const [playable, setPlayable] = useState(false);
 	const [result, setResult] = useState<{ winner: string | undefined, picks: Map<string, RpsPossibilites> } | undefined>();
-	const [score, setScore] = useState<Map<string, number>>(new Map());
+	const [score, setScore] = useState<Map<string, number>>(new Map()); // TODO : Score feedback
 	const [pick, setPick] = useState<RpsPossibilites | undefined>();
 
 	useEffect(() => {
