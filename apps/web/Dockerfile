@@ -3,6 +3,9 @@ ARG NODE_VERSION=26-alpine
 # Installing
 FROM node:${NODE_VERSION} AS installer
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
 RUN apk add --no-cache libc6-compat python3 make g++
 RUN npm install -g corepack
 
