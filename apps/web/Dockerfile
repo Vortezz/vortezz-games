@@ -1,5 +1,20 @@
 ARG NODE_VERSION=26-alpine
 
+# Installing
+FROM node:${NODE_VERSION} AS installer
+
+RUN apk add --no-cache libc6-compat python3 make g++
+RUN npm install -g corepack
+
+WORKDIR /app
+
+COPY . .
+
+RUN corepack enable pnpm
+RUN pnpm add -D turbo
+
+RUN turbo prune --scope=web --docker
+
 # Building
 FROM node:${NODE_VERSION} AS builder
 
@@ -8,7 +23,7 @@ RUN npm install -g corepack
 
 WORKDIR /app
 
-COPY . .
+COPY --from=installer /app/out .
 
 RUN corepack enable pnpm
 RUN pnpm install --config.confirmModulesPurge=false
