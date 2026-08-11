@@ -11,7 +11,7 @@ WORKDIR /app
 COPY . .
 
 RUN corepack enable pnpm
-RUN pnpm add -D turbo
+RUN pnpm add -g turbo
 
 RUN turbo prune --scope=api --docker
 
