@@ -13,7 +13,7 @@ export default class CoreWebsocketService {
 	public initialize(): void {
 		console.log("Initializing CoreWebsocketService");
 
-		const PORT = parseInt(process.env.PORT ?? "") || 3000;
+		const PORT = parseInt(process.env.PORT ?? "") || 3334;
 		const wss = new WebSocketServer({ port: PORT }, () => {
 			console.log(`Ready`);
 		});
