@@ -11,10 +11,14 @@ WORKDIR /app
 COPY ../../ .
 
 RUN corepack enable pnpm
-RUN pnpm install --config.confirmModulesPurge=false # TODO : Install and build only useful projects
+RUN pnpm install --config.confirmModulesPurge=false
 RUN pnpm build
 
 # Execution
-EXPOSE 3000
+FROM nginx:1.25.2-alpine-slim
 
-CMD ["node", "apps/api/dist/index.js"]
+COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
