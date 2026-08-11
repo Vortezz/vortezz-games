@@ -8,7 +8,7 @@ RUN npm install -g corepack
 
 WORKDIR /app
 
-COPY ../../ .
+COPY . .
 
 RUN corepack enable pnpm
 RUN pnpm install --config.confirmModulesPurge=false # TODO : Install and build only useful projects

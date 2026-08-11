@@ -8,7 +8,7 @@ RUN npm install -g corepack
 
 WORKDIR /app
 
-COPY ../../ .
+COPY . .
 
 RUN corepack enable pnpm
 RUN pnpm install --config.confirmModulesPurge=false
@@ -18,7 +18,7 @@ RUN pnpm build
 FROM nginx:1.25.2-alpine-slim
 
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY apps/web/nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 
