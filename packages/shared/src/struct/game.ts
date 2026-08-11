@@ -71,6 +71,11 @@ export const AvailableGames: Record<string, AvailableGamesType> = {
 				name: "End page",
 				type: "wikipage",
 			},
+			allowFind: {
+				value: false,
+				name: "Allow find",
+				type: "boolean",
+			},
 		},
 	},
 };

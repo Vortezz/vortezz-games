@@ -48,33 +48,53 @@ export function GameLobby() {
 					let settingInput: JSX.Element;
 
 					if (settings.type === "wikipage") {
-						settingInput = <WikipediaPageInput value={settings.value}
-							setValue={(value) => {
-								settings.value = value;
-
-								websocket.send("setSettings", websocket?.getRoom()?.game.settings);
-							}}
-							disabled={!websocket.isRoomOwner()} />;
-					} else {
-						settingInput = <input type={settings.type}
-							disabled={!websocket.isRoomOwner()}
-							value={settings.value}
-							onChange={(e) => {
-								const value = e.target.value;
-
-								if (settings.type === "number") {
-									settings.value = parseInt(value, 10);
-								} else {
-									// @ts-ignore
+						settingInput = <>
+							<label htmlFor={id}>{settings.name}</label>
+							<WikipediaPageInput value={settings.value}
+								setValue={(value) => {
 									settings.value = value;
-								}
 
-								websocket.send("setSettings", websocket?.getRoom()?.game.settings);
-							}} />;
+									websocket.send("setSettings", websocket?.getRoom()?.game.settings);
+								}}
+								disabled={!websocket.isRoomOwner()} />
+						</>;
+					} else if (settings.type === "boolean") {
+						settingInput = <div className={"flex items-center gap-4"}>
+							<input type={"checkbox"}
+								className={"h-4 p-0 w-4"}
+								id={id}
+								value={settings.value}
+								onChange={(e) => {
+									settings.value = e.target.checked;
+
+									websocket.send("setSettings", websocket?.getRoom()?.game.settings);
+								}}
+								disabled={!websocket.isRoomOwner()} />
+							<label htmlFor={id}
+								className={"h-fit"}>{settings.name}</label>
+						</div>;
+					} else {
+						settingInput = <>
+							<label htmlFor={id}>{settings.name}</label>
+							<input type={settings.type}
+								disabled={!websocket.isRoomOwner()}
+								value={settings.value}
+								onChange={(e) => {
+									const value = e.target.value;
+
+									if (settings.type === "number") {
+										settings.value = parseInt(value, 10);
+									} else {
+										// @ts-ignore
+										settings.value = value;
+									}
+
+									websocket.send("setSettings", websocket?.getRoom()?.game.settings);
+								}} />
+						</>;
 					}
 
 					return <div className={"mt-4"}>
-						<label htmlFor={id}>{settings.name}</label>
 						{settingInput}
 					</div>;
 				})}

@@ -18,6 +18,28 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 		super(props);
 	}
 
+	public componentDidMount(): () => void {
+		const superResult = super.componentDidMount();
+
+		const preventFind = (e: KeyboardEvent) => {
+			if (this.getGame().settings.allowFind.value || this.websocket.getGameStatus() !== "playing") {
+				return;
+			}
+
+			if (e.code === "F3" || (e.ctrlKey && e.code === "KeyF")) {
+				e.preventDefault();
+			}
+		};
+
+		window.addEventListener("keydown", preventFind);
+
+		return () => {
+			superResult();
+
+			window.removeEventListener("keydown", preventFind);
+		};
+	}
+
 	public renderPlaying(): JSX.Element {
 		if (this.state.finished) {
 			return <div className={"game-container gradient-reverse"}>
