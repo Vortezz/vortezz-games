@@ -16,7 +16,7 @@ COPY . .
 RUN corepack enable pnpm
 RUN pnpm add -g turbo
 
-RUN turbo prune --scope=api --docker
+RUN turbo prune api --docker
 
 # Building
 FROM node:${NODE_VERSION} AS builder

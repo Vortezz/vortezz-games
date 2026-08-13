@@ -16,7 +16,7 @@ COPY . .
 RUN corepack enable pnpm
 RUN pnpm add -g turbo
 
-RUN turbo prune --scope=web --docker
+RUN turbo prune web --docker
 
 # Building
 FROM node:${NODE_VERSION} AS builder
