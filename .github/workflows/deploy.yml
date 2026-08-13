@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${SSH_KEY}" > ~/.ssh/github-action
+          chmod 400 ~/.ssh/github-action
+          echo -e "Host games-vortezz\n\tUser ${SSH_USER}\n\tHostname ${SSH_HOSTNAME}\n\tPort ${SSH_PORT}\n\tStrictHostKeyChecking No\n\tIdentityFile ~/.ssh/github-action" >> ~/.ssh/config
+
+      - name: Deploy
+        run: ssh games-vortezz "sh deploy.sh"
