@@ -1,0 +1,24 @@
+name: "vortezz-games"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+    ports:
+      - "23000:3000"
+    networks:
+      - internal
+  front:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+    networks:
+      - internal
+    ports:
+      - "20080:80"
+    depends_on:
+      - api
+
+networks:
+  internal:

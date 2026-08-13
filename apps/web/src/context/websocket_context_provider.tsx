@@ -11,9 +11,9 @@ export function WebsocketProvider({ children }: { children: ReactNode }) {
 		createWebsocket: ({ name, roomName, id, password }) => {
 			let ws;
 			if (id) {
-				ws = new WebSocket(`ws://localhost:3000/?id=${id}&action=join&name=${name}${password ? `&password=${password}` : ""}`);
+				ws = new WebSocket(`wss://games.vrtz.dev/ws?id=${id}&action=join&name=${name}${password ? `&password=${password}` : ""}`);
 			} else {
-				ws = new WebSocket(`ws://localhost:3000/?roomName=${roomName}&action=create&name=${name}${password ? `&password=${password}` : ""}`);
+				ws = new WebSocket(`wss://games.vrtz.dev/ws?roomName=${roomName}&action=create&name=${name}${password ? `&password=${password}` : ""}`);
 			}
 
 			const wsPlayer = new WebsocketPlayer(ws, forceUpdate);
