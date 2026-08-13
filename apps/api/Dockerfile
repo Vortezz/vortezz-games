@@ -26,7 +26,7 @@ RUN npm install -g corepack
 
 WORKDIR /app
 
-COPY --from=installer /app/out .
+COPY --from=installer /app/out/full .
 
 RUN corepack enable pnpm
 RUN pnpm install --config.confirmModulesPurge=false
