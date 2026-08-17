@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: ./apps/api/Dockerfile
     ports:
-      - "23000:3000"
+      - "23000:3334"
     networks:
       - internal
   front:
