@@ -2,7 +2,7 @@ import { WebSocketServer } from "ws";
 import RoomsService from "./rooms_service";
 import { Room } from "../struct/room";
 import { WebSocketClient } from "../struct/websocket_client";
-import { generateString } from "../util/random_util";
+import { generateString } from "@repo/shared";
 
 export default class CoreWebsocketService {
 

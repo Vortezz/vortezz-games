@@ -1,6 +1,5 @@
-import { GameTypes } from "@repo/shared";
+import { GameTypes, generateString } from "@repo/shared";
 import { Room } from "../struct/room";
-import { generateString } from "../util/random_util";
 import { WebSocketClient } from "../struct/websocket_client";
 import { RockPaperScissorsGame } from "../struct/game/rps_game";
 import { WikiRaceGame } from "../struct/game/wikirace_game";

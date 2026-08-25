@@ -3,10 +3,13 @@ import "./index.css";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./router";
 import { WebsocketProvider } from "./context/websocket_context_provider";
+import { NotificationProvider } from "./context/notification_context_provider";
 
 function App() {
 	return <WebsocketProvider>
-		<RouterProvider router={router} />
+		<NotificationProvider>
+			<RouterProvider router={router} />
+		</NotificationProvider>
 	</WebsocketProvider>;
 }
 
