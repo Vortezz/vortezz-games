@@ -1,6 +1,5 @@
-import { CoreMessageTypings, GamePlayer, RoomEvents, RoomTypings } from "@repo/shared";
+import { CoreMessageTypings, GamePlayer, generateString, RoomEvents, RoomTypings } from "@repo/shared";
 import { AbstractGame } from "./game/abstract_game";
-import { generateString } from "../util/random_util";
 import { WebSocketClient } from "./websocket_client";
 import { RockPaperScissorsGame } from "./game/rps_game";
 
