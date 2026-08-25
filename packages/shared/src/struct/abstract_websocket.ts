@@ -81,4 +81,8 @@ export class AbstractWebSocket {
 	public clearHandlers<E extends CoreMessageTypings, K extends keyof E>(key: K) {
 		this.callbacks.delete(key.toString());
 	}
+
+	public close(code?: number) {
+		this.ws.close(code);
+	}
 }

@@ -20,6 +20,7 @@ interface CoreMessageTypings {
 		format: "points" | "duration";
 	}[];
 	self: string;
+	error: string;
 
 	// Clientbound
 	ping: void;

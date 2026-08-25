@@ -39,7 +39,11 @@ export default class RoomsService {
 	}
 
 	public registerPlayer(room: Room, wsClient: WebSocketClient, name: string, id: string) {
-		// TODO : Prevent from using a name already used
+		if (room.getPlayers().find(player => player.name === name)) {
+			wsClient.send("error", "Name already used");
+			wsClient.close(3000);
+			return;
+		}
 
 		const otherPlayers = room.getPlayers();
 
@@ -88,7 +92,7 @@ export default class RoomsService {
 		const game = room.getGame();
 
 		if (game === undefined) {
-			// TODO : Send error
+			room.getPlayers().find(player => player.owner)?.ws?.send("error", "Unknown error");
 			return;
 		}
 

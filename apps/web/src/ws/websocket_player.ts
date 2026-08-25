@@ -99,6 +99,10 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 		this.on("setResults", (results) => {
 			this.room!.game.results = results;
 		});
+
+		this.on("error", (error) => {
+			this.showNotification("error", error);
+		});
 	}
 
 	public isConnected() {

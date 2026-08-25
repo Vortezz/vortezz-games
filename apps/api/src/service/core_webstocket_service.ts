@@ -32,8 +32,10 @@ export default class CoreWebsocketService {
 				|| action === null || action === ""
 				|| ((id === null || id === "") && action !== "create")
 				|| ((roomName === null || roomName === "") && action === "create")) {
-				// TODO
-				console.log("Missing argument");
+				ws.send(JSON.stringify({
+					type: "error",
+					data: "Invalid URL",
+				}));
 				ws.close(3000);
 				return;
 			}
@@ -41,21 +43,25 @@ export default class CoreWebsocketService {
 			let room: Room | undefined;
 			if (action === "create") {
 				room = RoomsService.INSTANCE.createRoom(roomName ?? "", password);
-				console.log("Creating");
 			} else {
 				room = RoomsService.INSTANCE.getRoom(id ?? "");
 
 				if (room && !room.checkPassword(password)) {
-					// TODO
-					console.log("Invalid pswd");
+					ws.send(JSON.stringify({
+						type: "error",
+						data: "Invalid password",
+					}));
+					ws.close(3000);
 					return;
 				}
 				console.log("Joining");
 			}
 
 			if (room === undefined) {
-				// TODO
-				console.log("No room");
+				ws.send(JSON.stringify({
+					type: "error",
+					data: "Invalid room code",
+				}));
 				ws.close(3000);
 				return;
 			}
