@@ -2,16 +2,40 @@ import { useContext } from "react";
 import { WebsocketContext } from "../../../context/websocket_context";
 import { AvailableGames, GameTypes } from "@repo/shared/src/struct/game";
 import { WikipediaPageInput } from "../../input/wikipedia_page_input";
+import copy from "../../../resources/copy.svg";
+import share from "../../../resources/share.svg";
+import { NotificationContext } from "../../../context/notification_context";
 
 export function GameLobby() {
 	const { websocket } = useContext(WebsocketContext);
+	const { showNotification } = useContext(NotificationContext);
 
 	if (!websocket || !websocket.isConnected) {
 		return <></>;
 	}
 
 	return <div className={"game-container gradient-reverse"}>
-		<h1>Room code: {websocket.getRoom()?.id}</h1>
+		<div className={"flex gap-12 items-center"}>
+			<h1>Room code: {websocket.getRoom()?.id} </h1>
+			<div className={"flex gap-4 items-center"}>
+				<img src={copy}
+					onClick={() => {
+						showNotification("info", "Code copied to clipboard");
+
+						return navigator.clipboard.writeText(websocket.getRoom()?.id ?? "");
+					}}
+					alt={"copy"}
+					className={"h-8 stroke-white cursor-pointer"} />
+				<img src={share}
+					onClick={() => {
+						showNotification("info", "Link copied to clipboard");
+
+						return navigator.clipboard.writeText(`https://vrtz.dev/g/${websocket.getRoom()?.id ?? ""}`);
+					}}
+					alt={"share"}
+					className={"h-8 stroke-white cursor-pointer"} />
+			</div>
+		</div>
 		<hr className={"text-[#676767]"} />
 		<div className={"flex mx-auto w-240 gap-8"}>
 			<div className={"w-108"}>
