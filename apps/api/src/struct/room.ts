@@ -34,7 +34,14 @@ export class Room implements RoomTypings {
 	}
 
 	public registerPlayer(name: string, ws: WebSocketClient | undefined, id: string | undefined, owner: boolean | undefined): boolean {
-		// TODO : Prevent registration if game is pending
+		if (this.game.isGameStarted()) {
+			if (ws) {
+				ws.send("error", "Game already started");
+				ws.close(3000);
+			}
+
+			return false;
+		}
 
 		let realId = id;
 		if (realId === undefined) {

@@ -21,6 +21,13 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 	constructor(ws: WebSocket, forceUpdate: () => void, showNotification: (type: NotificationType, message: string) => void) {
 		super(ws);
 
+		ws.addEventListener("close", (e) => {
+			if (e.code !== 3000) {
+				showNotification("error", "Unexpected error occurred");
+				router.navigate("/");
+			}
+		});
+
 		this.forceUpdate = forceUpdate;
 		this.showNotification = showNotification;
 
@@ -98,6 +105,10 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 
 		this.on("setResults", (results) => {
 			this.room!.game.results = results;
+		});
+
+		this.on("error", (error) => {
+			this.showNotification("error", error);
 		});
 	}
 
