@@ -28,6 +28,8 @@ WORKDIR /app
 
 COPY --from=installer /app/out/full .
 
+RUN echo "{'apiUrl': 'wss://games.vortezz.dev'}"
+
 RUN corepack enable pnpm
 RUN pnpm install --config.confirmModulesPurge=false
 RUN pnpm build
