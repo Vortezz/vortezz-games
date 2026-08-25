@@ -1,6 +1,7 @@
 import { ReactNode, useReducer, useState } from "react";
 import WebsocketPlayer from "../ws/websocket_player";
 import { WebsocketContext } from "./websocket_context";
+import config from "../config.json";
 
 export function WebsocketProvider({ children }: { children: ReactNode }) {
 	const [ws, setWS] = useState<undefined | WebsocketPlayer>();
@@ -11,9 +12,9 @@ export function WebsocketProvider({ children }: { children: ReactNode }) {
 		createWebsocket: ({ name, roomName, id, password }) => {
 			let ws;
 			if (id) {
-				ws = new WebSocket(`wss://games.vortezz.dev/ws?id=${id}&action=join&name=${name}${password ? `&password=${password}` : ""}`);
+				ws = new WebSocket(`${config.apiUrl}/ws?id=${id}&action=join&name=${name}${password ? `&password=${password}` : ""}`);
 			} else {
-				ws = new WebSocket(`wss://games.vortezz.dev/ws?roomName=${roomName}&action=create&name=${name}${password ? `&password=${password}` : ""}`);
+				ws = new WebSocket(`${config.apiUrl}/ws?roomName=${roomName}&action=create&name=${name}${password ? `&password=${password}` : ""}`);
 			}
 
 			const wsPlayer = new WebsocketPlayer(ws, forceUpdate);
