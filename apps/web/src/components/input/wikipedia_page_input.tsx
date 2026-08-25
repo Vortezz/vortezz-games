@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 // TODO : Validation
-export function WikipediaPageInput({ value, setValue, disabled }: { value: string, setValue: (value: string) => void, disabled: boolean }) {
+export function WikipediaPageInput({ value, setValue, disabled, lang }: { value: string, setValue: (value: string) => void, disabled: boolean, lang: string }) {
 	const ref = useRef<HTMLDivElement>(null);
 
 	const [searchText, setSearchText] = useState<string>(value);
@@ -13,7 +13,7 @@ export function WikipediaPageInput({ value, setValue, disabled }: { value: strin
 			return;
 		}
 
-		fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${searchText}&utf8=&format=json&origin=*&srlimit=5&srprop=title`)
+		fetch(`https://${lang}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${searchText}&utf8=&format=json&origin=*&srlimit=5&srprop=title`)
 			.then(response => response.json())
 			.then(data => {
 				setChoices(data.query.search.map((item: any) => item.title));

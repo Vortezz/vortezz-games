@@ -5,6 +5,7 @@ import { WikipediaPageInput } from "../../input/wikipedia_page_input";
 import copy from "../../../resources/copy.svg";
 import share from "../../../resources/share.svg";
 import { NotificationContext } from "../../../context/notification_context";
+import { WikipediaLanguageInput } from "../../input/wikipedia_language_input";
 
 export function GameLobby() {
 	const { websocket, forceUpdate } = useContext(WebsocketContext);
@@ -89,6 +90,18 @@ export function GameLobby() {
 
 									forceUpdate();
 								} : () => {
+								}}
+								lang={websocket?.getRoom()?.game.settings.language.value ?? "en"}
+								disabled={!websocket.isRoomOwner()} />
+						</>;
+					} else if (settings.type === "wikilanguage") {
+						settingInput = <>
+							<label htmlFor={id}>{settings.name}</label>
+							<WikipediaLanguageInput value={settings.value}
+								setValue={(value) => {
+									settings.value = value;
+
+									websocket.send("setSettings", websocket?.getRoom()?.game.settings);
 								}}
 								disabled={!websocket.isRoomOwner()} />
 						</>;

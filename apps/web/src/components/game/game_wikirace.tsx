@@ -110,7 +110,7 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 			return;
 		}
 
-		fetch(`https://en.wikipedia.org/w/api.php?action=parse&prop=text&page=${title}&format=json&redirects=true&Sdisableeditsection=1&origin=*`)
+		fetch(`https://${this.getGame().settings.language.value}.wikipedia.org/w/api.php?action=parse&prop=text&page=${title}&format=json&redirects=true&Sdisableeditsection=1&origin=*`)
 			.then(res => res.json())
 			.then(json => {
 				this.setState({
