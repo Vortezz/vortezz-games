@@ -1,9 +1,11 @@
 import { AbstractWebSocket, RoomTypings } from "@repo/shared";
 import { router } from "../router";
+import { NotificationType } from "../context/notification_context";
 
 export default class WebsocketPlayer extends AbstractWebSocket {
 
 	private readonly forceUpdate: () => void;
+	private readonly showNotification: (type: NotificationType, message: string) => void;
 	private room: RoomTypings | undefined;
 	private gameStatus: "lobby" | "playing" | "results" = "lobby";
 	private gameStartedAt: number = 0;
@@ -16,10 +18,11 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 
 	// TODO : Load self
 
-	constructor(ws: WebSocket, forceUpdate: () => void) {
+	constructor(ws: WebSocket, forceUpdate: () => void, showNotification: (type: NotificationType, message: string) => void) {
 		super(ws);
 
 		this.forceUpdate = forceUpdate;
+		this.showNotification = showNotification;
 
 		this.setupListener();
 
@@ -55,12 +58,16 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 			this.room?.players.set(data.id, data);
 
 			this.forceUpdate();
+
+			this.showNotification("enter", `${data.name} joined`);
 		});
 
 		this.on("playerLeft", (data) => {
 			this.room?.players.delete(data.id);
 
 			this.forceUpdate();
+
+			this.showNotification("exit", `${data.name} left`);
 		});
 
 		this.on("gameStarted", () => {

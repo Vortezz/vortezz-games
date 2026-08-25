@@ -6,11 +6,11 @@ import { WebsocketProvider } from "./context/websocket_context_provider";
 import { NotificationProvider } from "./context/notification_context_provider";
 
 function App() {
-	return <WebsocketProvider>
-		<NotificationProvider>
+	return <NotificationProvider>
+		<WebsocketProvider>
 			<RouterProvider router={router} />
-		</NotificationProvider>
-	</WebsocketProvider>;
+		</WebsocketProvider>
+	</NotificationProvider>;
 }
 
 createRoot(document.getElementById("app")!).render(<App />);
