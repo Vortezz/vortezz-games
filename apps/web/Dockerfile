@@ -28,7 +28,7 @@ WORKDIR /app
 
 COPY --from=installer /app/out/full .
 
-RUN echo "{'apiUrl': 'wss://games.vortezz.dev'}" > ./apps/web/src/config.json
+RUN echo "{\"apiUrl\": \"wss://games.vortezz.dev\"}" > ./apps/web/src/config.json
 
 RUN corepack enable pnpm
 RUN pnpm install --config.confirmModulesPurge=false
