@@ -1,13 +1,15 @@
 import { ReactNode, useState } from "react";
-import { NotificationContext } from "./notification_context";
+import { NotificationContext, NotificationType } from "./notification_context";
 import { generateString } from "@repo/shared/src/util/random_util";
 import error from "../resources/icons/error.svg";
 import info from "../resources/icons/info.svg";
 import success from "../resources/icons/success.svg";
 import warning from "../resources/icons/warning.svg";
+import enter from "../resources/icons/enter.svg";
+import exit from "../resources/icons/exit.svg";
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
-	const [notifications, setNotifications] = useState<{ type: "success" | "error" | "info" | "warning", message: string, id: string, removing: boolean }[]>([]);
+	const [notifications, setNotifications] = useState<{ type: NotificationType, message: string, id: string, removing: boolean }[]>([]);
 
 	function removeNotification(id: string) {
 		setNotifications(prevState => {
@@ -36,7 +38,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 		});
 	}
 
-	function showNotification(type: "success" | "error" | "info" | "warning", message: string) {
+	function showNotification(type: NotificationType, message: string) {
 		const id = generateString(8);
 		setNotifications((prevState) => [...prevState, { type, message, id, removing: false }]);
 
@@ -63,6 +65,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 				} else if (item.type === "warning") {
 					srcImg = warning;
 					altImg = "⚠️";
+				} else if (item.type === "enter") {
+					srcImg = enter;
+					altImg = "➕";
+				} else if (item.type === "exit") {
+					srcImg = exit;
+					altImg = "🚪";
 				}
 
 				return <div key={item.id}
