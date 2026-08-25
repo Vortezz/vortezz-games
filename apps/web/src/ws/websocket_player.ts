@@ -21,6 +21,13 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 	constructor(ws: WebSocket, forceUpdate: () => void, showNotification: (type: NotificationType, message: string) => void) {
 		super(ws);
 
+		ws.addEventListener("close", (e) => {
+			if (e.code !== 3000) {
+				showNotification("error", "Unexpected error occurred");
+				router.navigate("/");
+			}
+		});
+
 		this.forceUpdate = forceUpdate;
 		this.showNotification = showNotification;
 
