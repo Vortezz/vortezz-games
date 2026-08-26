@@ -7,7 +7,7 @@ import share from "../../../resources/share.svg";
 import { NotificationContext } from "../../../context/notification_context";
 
 export function GameLobby() {
-	const { websocket } = useContext(WebsocketContext);
+	const { websocket, forceUpdate } = useContext(WebsocketContext);
 	const { showNotification } = useContext(NotificationContext);
 
 	if (!websocket || !websocket.isConnected) {
@@ -69,7 +69,6 @@ export function GameLobby() {
 					})}
 				</select>
 				{Object.entries(websocket?.getRoom()?.game.settings ?? {}).map(([id, settings]) => {
-					console.log(settings);
 					let settingInput: JSX.Element;
 
 					if (settings.type === "wikipage") {
@@ -85,6 +84,10 @@ export function GameLobby() {
 										name: id,
 										value: value,
 									});
+
+									settings.value = value;
+
+									forceUpdate();
 								} : () => {
 								}}
 								disabled={!websocket.isRoomOwner()} />

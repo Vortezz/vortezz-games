@@ -24,5 +24,6 @@ export function WebsocketProvider({ children }: { children: ReactNode }) {
 
 			setWS(wsPlayer);
 		},
+		forceUpdate,
 	}}>{children}</WebsocketContext.Provider>;
 }

@@ -12,12 +12,14 @@ export interface Events {
 	playerAdded: GamePlayer;
 }
 
+export type SettingType = "number" | "wikilanguage" | "wikipage" | "boolean";
+
 export interface GameTypings {
 	type: GameTypes;
 	room: RoomTypings;
 	settings: Record<string, {
 		name: string;
-		type: string;
+		type: SettingType;
 		value: any;
 	}>;
 	results: {
@@ -33,7 +35,7 @@ export interface AvailableGamesType {
 	maxPlayers: number;
 	settings: Record<string, {
 		name: string;
-		type: string;
+		type: SettingType;
 		value: any;
 	}>;
 }
@@ -79,5 +81,33 @@ export const AvailableGames: Record<string, AvailableGamesType> = {
 		},
 	},
 };
+
+export async function validateSetting(type: SettingType, value: any, otherSettings: Record<string, {
+	name: string;
+	type: SettingType;
+	value: any;
+}>) {
+	if (type === "number") {
+		return typeof value === "number";
+	} else if (type === "boolean") {
+		return typeof value === "boolean";
+	} else if (type === "wikilanguage") {
+		return ["fr", "en"].indexOf(value) !== -1;
+	} else if (type === "wikipage") {
+		if (!otherSettings.language) {
+			return false;
+		}
+
+		const response = await fetch(`https://${otherSettings.language.value}.wikipedia.org/w/api.php?action=parse&prop=&page=${value}&format=json&redirects=true&origin=*`);
+
+		if (!response.ok) {
+			return false;
+		}
+
+		const json = await response.json();
+
+		return !json.error;
+	}
+}
 
 export type GameTypes = keyof typeof AvailableGames;
