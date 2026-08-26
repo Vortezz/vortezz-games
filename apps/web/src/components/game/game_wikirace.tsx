@@ -55,21 +55,46 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 
 		return <div className={"game-container bg-white"}>
 			<h3 className={"text-black flex"}>Get to {this.getGame().settings.endPage.value} -&nbsp;<TimerComponent startedAt={this.websocket.getGameStartedAt()} /></h3>
-			<div className={"wiki-wrapper"}>
+			<div className={`wiki-wrapper lang-${this.getGame().settings.language.value}`}>
 				<h1 className={"mw-heading"}>{this.state.currentPage}</h1>
 				{this.state.currentPageContent ? <div className={"wiki-wrapper w-[calc(90%)]"}
 					onClick={e => {
+						if (!(e.target instanceof HTMLElement)) {
+							e.preventDefault();
+							return;
+						}
+
+						let element = e.target;
+						if (!(e.target instanceof HTMLAnchorElement)) {
+							if (element.parentElement) {
+								element = element.parentElement;
+							} else {
+								e.preventDefault();
+								return;
+							}
+						}
+
+						if (!(element instanceof HTMLAnchorElement)) {
+							e.preventDefault();
+							return;
+						}
+
+						const href = element.href;
+						console.log(href);
+						if (!href.includes(window.location.origin)) {
+							e.preventDefault();
+							return;
+						}
+
+						if (href.replace(window.location.href.split("#")[0], "").startsWith("#")) {
+							return;
+						}
+
+						const title = element.title;
+
 						e.preventDefault();
 
-						if (!(e.target instanceof HTMLAnchorElement)) {
-							return;
-						}
-
-						if (!e.target.href.includes(window.location.origin)) {
-							return;
-						}
-
-						this.changePage(e.target.title);
+						this.changePage(title);
 					}}
 					dangerouslySetInnerHTML={{ __html: this.state.currentPageContent }} /> : <p>Loading...</p>}
 			</div>
@@ -110,7 +135,7 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 			return;
 		}
 
-		fetch(`https://${this.getGame().settings.language.value}.wikipedia.org/w/api.php?action=parse&prop=text&page=${title}&format=json&redirects=true&Sdisableeditsection=1&origin=*`)
+		fetch(`https://${this.getGame().settings.language.value}.wikipedia.org/w/api.php?action=parse&prop=text&page=${title}&format=json&redirects=true&useskin=minerva&origin=*`)
 			.then(res => res.json())
 			.then(json => {
 				this.setState({

@@ -29,6 +29,12 @@
     p {
         @apply leading-tight text-white;
     }
+
+    ul, ol {
+        list-style: revert;
+        margin: revert;
+        padding: revert;
+    }
 }
 
 body {
@@ -62,25 +68,58 @@ body {
         background: none;
     }
 
-    .infobox {
+    .infobox, .infobox_v2 {
         font-size: 90%;
         position: relative;
         border: 1px solid #eaecf0;
+        border-spacing: 5px;
         margin-bottom: 2em;
         background-color: #f8f9fa;
         display: flex;
         flex: 1 1 100%;
+        float: right;
+        clear: right;
+        line-height: 1.2em;
         flex-flow: column nowrap;
+        max-width: 320px;
+    }
+
+    #toc {
+        border: 1px solid #eaecf0;
+        background-color: #f8f9fa;
+        padding-right: 1em;
+        list-style-type: none;
+
+        h2 {
+            font-weight: bold;
+            border-bottom: 0;
+            font-size: 1.2em;
+            margin-left: 1rem;
+        }
+
+        .toclevel-3 {
+            display: none;
+        }
+
+        ul {
+            list-style-type: none;
+            margin-left: 1rem;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
     }
 
     .mw-heading {
         font-family: Linux Libertine, Georgia, Times, "Source Serif Pro", serif;
-        font-weight: normal;
         border-bottom: 1px solid #a2a9b1;
         margin-bottom: .5em;
     }
 
-    .mw-heading > h1, h2, h3, h4 {
+    .mw-heading > h2, h3, h4 {
+        font-weight: normal;
         border-bottom: 0;
         font-size: 1.5em;
     }
