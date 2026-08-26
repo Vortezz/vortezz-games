@@ -55,8 +55,8 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 			}
 		});
 
-		this.on("settingsUpdated", (data) => {
-			this.room!.game!.settings = data;
+		this.on("settingUpdated", (data) => {
+			this.room!.game!.settings[data.name].value = data.value;
 
 			this.forceUpdate();
 		});

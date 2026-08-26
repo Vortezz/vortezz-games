@@ -20,6 +20,9 @@ export function WikipediaPageInput({ value, setValue, disabled }: { value: strin
 			});
 	}, [searchText]);
 
+	useEffect(() => {
+		setSearchText(value);
+	}, [value]);
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {

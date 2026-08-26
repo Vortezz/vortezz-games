@@ -61,10 +61,23 @@ export default class RoomsService {
 				room.broadcast("roomData", room);
 			});
 
-			wsClient.on("setSettings", settings => {
-				room.game.settings = settings; // TODO : Check if valid
+			wsClient.on("setSetting", change => {
+				const setting = room.game.settings[change.name];
 
-				room.broadcast("settingsUpdated", settings);
+				if (!setting) {
+					wsClient.send("error", "Invalid setting");
+					return;
+				}
+
+				if (setting.value === change.value) {
+					return;
+				}
+
+				setting.value = change.value; // TODO : Check if valid
+
+				room.game.handleSettingChange(change.name, change.value);
+
+				room.broadcast("settingUpdated", change);
 			});
 
 			wsClient.on("resetGame", () => {
