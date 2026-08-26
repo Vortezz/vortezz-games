@@ -80,7 +80,6 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 						}
 
 						const href = element.href;
-						console.log(href);
 						if (!href.includes(window.location.origin)) {
 							e.preventDefault();
 							return;
