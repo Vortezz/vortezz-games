@@ -9,10 +9,12 @@ export type WebsocketContextProps = {
 		id?: string
 		password?: string
 	}) => void;
+	forceUpdate: () => void;
 };
 
 export const WebsocketContext: Context<WebsocketContextProps> = createContext<WebsocketContextProps>({
 	websocket: undefined,
 	createWebsocket: () => {
 	},
+	forceUpdate: () => {}
 });

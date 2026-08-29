@@ -7,7 +7,7 @@ import share from "../../../resources/share.svg";
 import { NotificationContext } from "../../../context/notification_context";
 
 export function GameLobby() {
-	const { websocket } = useContext(WebsocketContext);
+	const { websocket, forceUpdate } = useContext(WebsocketContext);
 	const { showNotification } = useContext(NotificationContext);
 
 	if (!websocket || !websocket.isConnected) {
@@ -75,10 +75,20 @@ export function GameLobby() {
 						settingInput = <>
 							<label htmlFor={id}>{settings.name}</label>
 							<WikipediaPageInput value={settings.value}
-								setValue={(value) => {
+								setValue={websocket.isRoomOwner() ? (value) => {
+									if (value === settings.value) {
+										return;
+									}
+
+									websocket.send("setSetting", {
+										name: id,
+										value: value,
+									});
+
 									settings.value = value;
 
-									websocket.send("setSettings", websocket?.getRoom()?.game.settings);
+									forceUpdate();
+								} : () => {
 								}}
 								disabled={!websocket.isRoomOwner()} />
 						</>;
@@ -87,12 +97,19 @@ export function GameLobby() {
 							<input type={"checkbox"}
 								className={"h-4 p-0 w-4"}
 								id={id}
-								value={settings.value}
-								onChange={(e) => {
-									settings.value = e.target.checked;
+								checked={settings.value}
+								onChange={websocket.isRoomOwner() ? (e) => {
+									const value = e.target.checked;
 
-									websocket.send("setSettings", websocket?.getRoom()?.game.settings);
-								}}
+									if (value === settings.value) {
+										return;
+									}
+
+									websocket.send("setSetting", {
+										name: id,
+										value: value,
+									});
+								} : undefined}
 								disabled={!websocket.isRoomOwner()} />
 							<label htmlFor={id}
 								className={"h-fit"}>{settings.name}</label>
@@ -101,24 +118,30 @@ export function GameLobby() {
 						settingInput = <>
 							<label htmlFor={id}>{settings.name}</label>
 							<input type={settings.type}
+								id={id}
 								disabled={!websocket.isRoomOwner()}
 								value={settings.value}
-								onChange={(e) => {
-									const value = e.target.value;
+								onChange={websocket.isRoomOwner() ? (e) => {
+									let value: any = e.target.value;
 
 									if (settings.type === "number") {
-										settings.value = parseInt(value, 10);
-									} else {
-										// @ts-ignore
-										settings.value = value;
+										value = parseInt(value, 10);
 									}
 
-									websocket.send("setSettings", websocket?.getRoom()?.game.settings);
-								}} />
+									if (value === settings.value) {
+										return;
+									}
+
+									websocket.send("setSetting", {
+										name: id,
+										value: value,
+									});
+								} : undefined} />
 						</>;
 					}
 
-					return <div className={"mt-4"}>
+					return <div className={"mt-4"}
+						key={id}>
 						{settingInput}
 					</div>;
 				})}

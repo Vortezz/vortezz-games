@@ -1,4 +1,4 @@
-import { GameTypes, generateString } from "@repo/shared";
+import { GameTypes, generateString, validateSetting } from "@repo/shared";
 import { Room } from "../struct/room";
 import { WebSocketClient } from "../struct/websocket_client";
 import { RockPaperScissorsGame } from "../struct/game/rps_game";
@@ -61,10 +61,29 @@ export default class RoomsService {
 				room.broadcast("roomData", room);
 			});
 
-			wsClient.on("setSettings", settings => {
-				room.game.settings = settings; // TODO : Check if valid
+			wsClient.on("setSetting", change => {
+				const setting = room.game.settings[change.name];
 
-				room.broadcast("settingsUpdated", settings);
+				if (!setting) {
+					wsClient.send("error", "Invalid setting");
+					return;
+				}
+
+				if (setting.value === change.value) {
+					return;
+				}
+
+				validateSetting(setting.type, change.value, room.game.settings).then(bool => {
+					if (!bool) {
+						return;
+					}
+
+					setting.value = change.value;
+
+					room.game.handleSettingChange(change.name, change.value);
+
+					room.broadcast("settingUpdated", change);
+				});
 			});
 
 			wsClient.on("resetGame", () => {

@@ -9,11 +9,10 @@ interface CoreMessageTypings {
 	playerLeft: GamePlayer,
 	gameStarted: void;
 	gameEnded: void;
-	settingsUpdated: Record<string, {
+	settingUpdated: {
 		name: string;
-		type: string;
 		value: any;
-	}>;
+	};
 	setResults: {
 		id: string;
 		amount: number;
@@ -27,11 +26,10 @@ interface CoreMessageTypings {
 	startGame: void;
 	abortGame: void;
 	setType: GameTypes;
-	setSettings: Record<string, {
+	setSetting: {
 		name: string;
-		type: string;
 		value: any;
-	}>;
+	};
 	resetGame: void;
 
 	// Both

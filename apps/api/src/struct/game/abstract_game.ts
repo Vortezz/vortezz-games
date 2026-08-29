@@ -15,7 +15,7 @@ export abstract class AbstractGame<E extends CoreMessageTypings> implements Game
 
 	protected constructor(room: Room, type: GameTypes) {
 		this.room = room;
-		this.settings = AvailableGames[type].settings;
+		this.settings = JSON.parse(JSON.stringify(AvailableGames[type].settings));
 		this.type = type;
 	}
 
@@ -50,6 +50,10 @@ export abstract class AbstractGame<E extends CoreMessageTypings> implements Game
 	}
 
 	public handleGameEvent(wsClient: WebSocketClient, data: { type: string, data: any }) {
+		// to be overridden
+	}
+
+	public handleSettingChange(name: string, value: any) {
 		// to be overridden
 	}
 }
