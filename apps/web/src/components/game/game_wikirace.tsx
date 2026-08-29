@@ -1,8 +1,10 @@
 import { AbstractGame, EventObject } from "./abstract_game";
-import { JSX } from "react";
+import { JSX, MouseEvent } from "react";
 import { WikiRaceMessageTypings } from "@repo/shared/src/message/game/wikirace_message_type";
 import { ResultWikiRace } from "./wikirace/result_wikirace";
 import { TimerComponent } from "./parts/timer";
+import { OverviewContent, WikipediaOverview } from "./wikirace/wikipedia_overview";
+import { createPortal } from "react-dom";
 
 interface WikiRaceTypings {
 	currentPage: string | undefined;
@@ -10,9 +12,43 @@ interface WikiRaceTypings {
 	finished: boolean;
 	finishedAt: Map<string, number>;
 	paths: { id: string, pages: string[] }[];
+	currentlyHovering: {
+		name: string;
+		element: HTMLAnchorElement;
+	} | undefined;
+}
+
+function getAnchor(e: MouseEvent, allowPrevent?: boolean) {
+	if (!(e.target instanceof HTMLElement)) {
+		e.preventDefault();
+		return;
+	}
+
+	let element = e.target;
+	if (!(e.target instanceof HTMLAnchorElement)) {
+		if (element.parentElement) {
+			element = element.parentElement;
+		} else {
+			if (allowPrevent) {
+				e.preventDefault();
+			}
+			return undefined;
+		}
+	}
+
+	if (!(element instanceof HTMLAnchorElement)) {
+		if (allowPrevent) {
+			e.preventDefault();
+		}
+		return undefined;
+	}
+
+	return element;
 }
 
 export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceTypings> {
+
+	private readonly savedOverviews: Map<string, OverviewContent | null> = new Map();
 
 	constructor(props: any) {
 		super(props);
@@ -57,26 +93,14 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 		return <div className={"game-container bg-white"}>
 			<h3 className={"text-black flex"}>Get to {this.getGame().settings.endPage.value} -&nbsp;<TimerComponent startedAt={this.websocket.getGameStartedAt()} /></h3>
 			<div className={`wiki-wrapper lang-${this.getGame().settings.language.value}`}>
+				{this.state.currentlyHovering && createPortal(<WikipediaOverview
+					content={this.savedOverviews.get(this.state.currentlyHovering.name)} />, this.state.currentlyHovering.element)}
 				<h1 className={"mw-heading"}>{this.state.currentPage}</h1>
 				{this.state.currentPageContent ? <div className={"wiki-wrapper w-[calc(90%)]"}
 					onClick={e => {
-						if (!(e.target instanceof HTMLElement)) {
-							e.preventDefault();
-							return;
-						}
+						const element = getAnchor(e, true);
 
-						let element = e.target;
-						if (!(e.target instanceof HTMLAnchorElement)) {
-							if (element.parentElement) {
-								element = element.parentElement;
-							} else {
-								e.preventDefault();
-								return;
-							}
-						}
-
-						if (!(element instanceof HTMLAnchorElement)) {
-							e.preventDefault();
+						if (!element) {
 							return;
 						}
 
@@ -95,6 +119,48 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 						e.preventDefault();
 
 						this.changePage(title);
+					}}
+					onMouseOver={e => {
+						const element = getAnchor(e);
+
+						if (!element) {
+							this.setState({
+								currentlyHovering: undefined,
+							});
+							return;
+						}
+
+						const title = element.title;
+						if (title === "" || title.includes(":")) {
+							this.setState({
+								currentlyHovering: undefined,
+							});
+							return;
+						}
+
+						this.setState({
+							currentlyHovering: {
+								name: title,
+								element: element
+							},
+						});
+
+						element.style.position="relative";
+
+						fetch(`https://${this.getGame().settings.language.value}.wikipedia.org/api/rest_v1/page/summary/${title}`)
+							.then(res => res.json())
+							.then(json => {
+								if (!json.thumbnail) {
+									this.savedOverviews.set(title, null);
+								} else {
+									this.savedOverviews.set(title, {
+										description: json.extract,
+										image: json.thumbnail.source,
+									});
+								}
+
+								this.forceUpdate();
+							});
 					}}
 					dangerouslySetInnerHTML={{ __html: this.state.currentPageContent }} /> : <p>Loading...</p>}
 			</div>
@@ -123,6 +189,7 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 		this.setState({
 			currentPage: title,
 			currentPageContent: undefined,
+			currentlyHovering: undefined,
 		});
 
 		if (!skipWs) {
@@ -180,6 +247,7 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 			finished: false,
 			finishedAt: new Map(),
 			paths: [],
+			currentlyHovering: undefined,
 		};
 	}
 }
