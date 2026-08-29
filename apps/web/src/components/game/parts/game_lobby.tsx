@@ -5,6 +5,7 @@ import { WikipediaPageInput } from "../../input/wikipedia_page_input";
 import copy from "../../../resources/copy.svg";
 import share from "../../../resources/share.svg";
 import { NotificationContext } from "../../../context/notification_context";
+import { WikipediaLanguageInput } from "../../input/wikipedia_language_input";
 
 export function GameLobby() {
 	const { websocket, forceUpdate } = useContext(WebsocketContext);
@@ -90,6 +91,23 @@ export function GameLobby() {
 									forceUpdate();
 								} : () => {
 								}}
+								lang={websocket?.getRoom()?.game.settings.language.value ?? "en"}
+								disabled={!websocket.isRoomOwner()} />
+						</>;
+					} else if (settings.type === "wikilanguage") {
+						settingInput = <>
+							<label htmlFor={id}>{settings.name}</label>
+							<WikipediaLanguageInput value={settings.value}
+								setValue={(value) => {
+									if (value === settings.value) {
+										return;
+									}
+
+									websocket.send("setSetting", {
+										name: id,
+										value: value,
+									});
+								}}
 								disabled={!websocket.isRoomOwner()} />
 						</>;
 					} else if (settings.type === "boolean") {
@@ -114,6 +132,31 @@ export function GameLobby() {
 							<label htmlFor={id}
 								className={"h-fit"}>{settings.name}</label>
 						</div>;
+					} else if (settings.type === "choice") {
+						settingInput = <>
+							<label htmlFor={id}>{settings.name}</label>
+							<select id={id}
+								value={settings.value}
+								disabled={!websocket.isRoomOwner()}
+								onChange={(e) => {
+									const value = e.target.value;
+
+									if (value === settings.value) {
+										return;
+									}
+
+									websocket.send("setSetting", {
+										name: id,
+										value: value,
+									});
+								}}>
+								{settings.data!.map((choice) => {
+									return <option id={choice.name}
+										key={choice.id}
+										value={choice.id}>{choice.name}</option>;
+								})}
+							</select>
+						</>;
 					} else {
 						settingInput = <>
 							<label htmlFor={id}>{settings.name}</label>

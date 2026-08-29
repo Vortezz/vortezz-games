@@ -87,4 +87,22 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 			}
 		}
 	}
+
+	public handleSettingChange(name: string, value: any) {
+		if (name === "language") {
+			this.settings.startPage.value = "";
+
+			this.getRoom().broadcast("settingUpdated", {
+				name: "startPage",
+				value: "",
+			});
+
+			this.settings.endPage.value = "";
+
+			this.getRoom().broadcast("settingUpdated", {
+				name: "endPage",
+				value: "",
+			});
+		}
+	}
 }
