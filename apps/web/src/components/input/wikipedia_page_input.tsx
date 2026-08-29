@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import random from "../../resources/icons/random.svg";
 
-// TODO : Validation
 export function WikipediaPageInput({ value, setValue, disabled, lang }: { value: string, setValue: (value: string) => void, disabled: boolean, lang: string }) {
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -11,6 +10,7 @@ export function WikipediaPageInput({ value, setValue, disabled, lang }: { value:
 
 	useEffect(() => {
 		if (searchText === "" || disabled) {
+			setChoices([]);
 			return;
 		}
 

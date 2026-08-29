@@ -99,9 +99,14 @@ export function GameLobby() {
 							<label htmlFor={id}>{settings.name}</label>
 							<WikipediaLanguageInput value={settings.value}
 								setValue={(value) => {
-									settings.value = value;
+									if (value === settings.value) {
+										return;
+									}
 
-									websocket.send("setSettings", websocket?.getRoom()?.game.settings);
+									websocket.send("setSetting", {
+										name: id,
+										value: value,
+									});
 								}}
 								disabled={!websocket.isRoomOwner()} />
 						</>;
