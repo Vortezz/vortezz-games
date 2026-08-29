@@ -16,7 +16,9 @@ export function ResultWikiRace({ paths, startPage, endPage, players, finishedAt,
 	const ref = useRef<SVGSVGElement>(null);
 
 	useEffect(() => {
-		const width = 600;
+		const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+
+		const width = Math.min(window.screen.width * 0.9, 60 * rootFontSize) - 20;
 		const height = 600;
 
 		const svg = d3.select(ref.current);
