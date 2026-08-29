@@ -123,6 +123,8 @@ export async function validateSetting(type: SettingType, value: any, name: strin
 	} else if (type === "choice") {
 		return otherSettings[name].data!.filter(e => e.id === value).length > 0;
 	}
+
+	return false;
 }
 
 export type GameTypes = keyof typeof AvailableGames;
