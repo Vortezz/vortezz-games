@@ -12,16 +12,22 @@ export interface Events {
 	playerAdded: GamePlayer;
 }
 
-export type SettingType = "number" | "wikilanguage" | "wikipage" | "boolean";
+export type SettingType = "number" | "wikilanguage" | "wikipage" | "boolean" | "choice";
+
+export type Settings = Record<string, {
+	name: string;
+	type: SettingType;
+	value: any;
+	data?: {
+		id: string;
+		name: string;
+	}[];
+}>;
 
 export interface GameTypings {
 	type: GameTypes;
 	room: RoomTypings;
-	settings: Record<string, {
-		name: string;
-		type: SettingType;
-		value: any;
-	}>;
+	settings: Settings;
 	results: {
 		id: string;
 		amount: number;
@@ -33,11 +39,7 @@ export interface AvailableGamesType {
 	name: string;
 	minPlayers: number;
 	maxPlayers: number;
-	settings: Record<string, {
-		name: string;
-		type: SettingType;
-		value: any;
-	}>;
+	settings: Settings;
 }
 
 export const AvailableGames: Record<string, AvailableGamesType> = {
@@ -78,15 +80,26 @@ export const AvailableGames: Record<string, AvailableGamesType> = {
 				name: "Allow find",
 				type: "boolean",
 			},
+			ranking: {
+				value: "fastest",
+				name: "Ranking",
+				type: "choice",
+				data: [
+					{
+						name: "Fastest",
+						id: "fastest",
+					},
+					{
+						name: "Lowest clics",
+						id: "lowestclics",
+					},
+				],
+			},
 		},
 	},
 };
 
-export async function validateSetting(type: SettingType, value: any, otherSettings: Record<string, {
-	name: string;
-	type: SettingType;
-	value: any;
-}>) {
+export async function validateSetting(type: SettingType, value: any, name: string, otherSettings: Settings) {
 	if (type === "number") {
 		return typeof value === "number";
 	} else if (type === "boolean") {
@@ -107,6 +120,8 @@ export async function validateSetting(type: SettingType, value: any, otherSettin
 		const json = await response.json();
 
 		return !json.error;
+	} else if (type === "choice") {
+		return otherSettings[name].data!.filter(e => e.id === value).length > 0;
 	}
 }
 

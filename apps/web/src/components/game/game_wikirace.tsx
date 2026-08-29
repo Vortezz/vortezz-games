@@ -49,7 +49,8 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 					endPage={this.getGame().settings.endPage.value}
 					players={this.getRoom().players}
 					finishedAt={this.state.finishedAt}
-					startedAt={this.websocket.getGameStartedAt()} />
+					startedAt={this.websocket.getGameStartedAt()}
+					settings={this.getGame().settings} />
 			</div>;
 		}
 
@@ -108,7 +109,8 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 				endPage={this.getGame().settings.endPage.value}
 				players={this.getRoom().players}
 				finishedAt={this.state.finishedAt}
-				startedAt={this.websocket.getGameStartedAt()} />
+				startedAt={this.websocket.getGameStartedAt()}
+				settings={this.getGame().settings} />
 			{this.getLobbyButton()}
 		</div>;
 	}

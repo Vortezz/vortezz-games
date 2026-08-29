@@ -57,7 +57,7 @@ export function WikipediaPageInput({ value, setValue, disabled, lang }: { value:
 				setFocused(false);
 			}
 		}}>
-		<div className={"bg-white flex border rounded-sm"}>
+		<div className={"bg-gray-50 flex border rounded-sm"}>
 			<input value={searchText}
 				disabled={disabled}
 				className={"border-none"}

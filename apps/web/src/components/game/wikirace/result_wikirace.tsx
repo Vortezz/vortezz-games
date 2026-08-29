@@ -2,14 +2,16 @@ import * as d3 from "d3";
 import { useEffect, useRef } from "react";
 import { GamePlayer } from "@repo/shared";
 import { TimerComponent } from "../parts/timer";
+import { Settings } from "@repo/shared/src/struct/game";
 
-export function ResultWikiRace({ paths, startPage, endPage, players, finishedAt, startedAt }: {
+export function ResultWikiRace({ paths, startPage, endPage, players, finishedAt, startedAt, settings }: {
 	paths: { id: string, pages: string[] }[],
 	startPage: string,
 	endPage: string,
 	players: Map<string, GamePlayer>,
 	finishedAt: Map<string, number>,
 	startedAt: number,
+	settings: Settings
 }) {
 	const ref = useRef<SVGSVGElement>(null);
 
@@ -173,13 +175,21 @@ export function ResultWikiRace({ paths, startPage, endPage, players, finishedAt,
 			</tr>
 			</thead>
 			<tbody>
-			{paths.map((path) => <tr>
-				<td>{players.get(path.id)!.name}</td>
-				<td><TimerComponent startedAt={startedAt}
-					finishedAt={finishedAt.get(path.id)} /></td>
-				<td>{path.pages.length}</td>
-				<td>{path.pages.join(" → ")}</td>
-			</tr>)}
+			{paths
+				.sort((a, b) => {
+					if (settings.ranking.value === "fastest") {
+						return (finishedAt.get(a.id) ?? 1e10) - (finishedAt.get(b.id) ?? 1e10);
+					} else {
+						return a.pages.length - b.pages.length;
+					}
+				})
+				.map((path) => <tr>
+					<td>{players.get(path.id)!.name}</td>
+					<td><TimerComponent startedAt={startedAt}
+						finishedAt={finishedAt.get(path.id)} /></td>
+					<td>{path.pages.length - 1}</td>
+					<td>{path.pages.join(" → ")}</td>
+				</tr>)}
 			</tbody>
 		</table>
 		<h3 className={"mt-8"}>Pages graph</h3>

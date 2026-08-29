@@ -73,7 +73,8 @@ export default class RoomsService {
 					return;
 				}
 
-				validateSetting(setting.type, change.value, room.game.settings).then(bool => {
+				validateSetting(setting.type, change.value, change.name, room.game.settings).then(bool => {
+					console.log(bool);
 					if (!bool) {
 						return;
 					}
