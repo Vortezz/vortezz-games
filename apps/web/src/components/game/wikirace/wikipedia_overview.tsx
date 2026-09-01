@@ -32,12 +32,13 @@ export function WikipediaOverview({ content }: {
 		</>;
 	}
 
-	return <div className={"absolute bg-white px-6 max-w-120 py-4 flex flex-col items-center border border-gray-300 rounded-md shadow-xl gap-4 z-5 w-120"}
+	return <div className={"absolute bg-white px-6 max-w-120 py-4 flex flex-col items-center border border-gray-300 rounded-md shadow-xl gap-4 z-5 w-120 cursor-default"}
 		style={{
 			top: `20px`,
 			left: `50%`,
 			transform: "translate(-50%, 0)",
-		}}>
+		}}
+		onClick={e => e.preventDefault()}>
 		{contentElement}
 	</div>;
 }
