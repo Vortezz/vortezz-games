@@ -1,8 +1,7 @@
 import * as d3 from "d3";
 import { useEffect, useRef } from "react";
-import { GamePlayer } from "@repo/shared";
+import { GamePlayer, Settings } from "@repo/shared";
 import { TimerComponent } from "../parts/timer";
-import { Settings } from "@repo/shared/src/struct/game";
 
 export function ResultWikiRace({ paths, startPage, endPage, players, finishedAt, startedAt, settings }: {
 	paths: { id: string, pages: string[] }[],

@@ -1,5 +1,5 @@
 import { AbstractGame, EventObject } from "./abstract_game";
-import { RpsMessageTypings, RpsPossibilites } from "@repo/shared/src/message/game/rps_message_type";
+import { RpsMessageTypings, RpsPossibilites } from "@repo/shared";
 import { JSX } from "react";
 
 const POSSIBILITY_TO_EMOJI = {

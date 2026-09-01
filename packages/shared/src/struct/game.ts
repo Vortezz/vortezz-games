@@ -14,7 +14,7 @@ export interface Events {
 
 export type SettingType = "number" | "wikilanguage" | "wikipage" | "boolean" | "choice";
 
-export type Settings = Record<string, {
+export type Setting = {
 	name: string;
 	type: SettingType;
 	value: any;
@@ -22,7 +22,9 @@ export type Settings = Record<string, {
 		id: string;
 		name: string;
 	}[];
-}>;
+};
+
+export type Settings = Record<string, Setting>;
 
 export interface GameTypings {
 	type: GameTypes;
@@ -107,10 +109,15 @@ export async function validateSetting(type: SettingType, value: any, name: strin
 	} else if (type === "wikilanguage") {
 		return ["fr", "en"].indexOf(value) !== -1;
 	} else if (type === "wikipage") {
-		if (!otherSettings.language) {
+		if (!otherSettings.language || value === "") {
 			return false;
 		}
 
+		if (value === otherSettings[name].value) {
+			return true;
+		}
+
+		// Server-side validation only
 		const response = await fetch(`https://${otherSettings.language.value}.wikipedia.org/w/api.php?action=parse&prop=&page=${value}&format=json&redirects=true&origin=*`);
 
 		if (!response.ok) {

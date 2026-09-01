@@ -1,4 +1,4 @@
-import { GameTypes, generateString, validateSetting } from "@repo/shared";
+import { GameTypes, generateString, Setting, validateSetting } from "@repo/shared";
 import { Room } from "../struct/room";
 import { WebSocketClient } from "../struct/websocket_client";
 import { RockPaperScissorsGame } from "../struct/game/rps_game";
@@ -74,7 +74,6 @@ export default class RoomsService {
 				}
 
 				validateSetting(setting.type, change.value, change.name, room.game.settings).then(bool => {
-					console.log(bool);
 					if (!bool) {
 						return;
 					}
@@ -108,12 +107,24 @@ export default class RoomsService {
 		console.log("Registered");
 	}
 
-	private startGame(room: Room) {
+	private async startGame(room: Room) {
 		const game = room.getGame();
+		const ownerWs = room.getPlayers().find(player => player.owner)?.ws;
 
 		if (game === undefined) {
-			room.getPlayers().find(player => player.owner)?.ws?.send("error", "Unknown error");
+			ownerWs?.send("error", "Unknown error");
 			return;
+		}
+
+		for (const [key, settingUkn] of Object.entries(game.settings)) {
+			const setting = settingUkn as Setting;
+
+			const validated = await validateSetting(setting.type, setting.value, key, room.game.settings);
+
+			if (!validated) {
+				ownerWs?.send("error", "Invalid settings");
+				return;
+			}
 		}
 
 		game.room.broadcast("gameStarted");
