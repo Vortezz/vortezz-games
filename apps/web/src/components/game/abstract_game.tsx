@@ -2,7 +2,7 @@ import { Component, ContextType } from "react";
 import { WebsocketContext, WebsocketContextProps } from "../../context/websocket_context";
 import { GameLobby } from "./parts/game_lobby";
 import WebsocketPlayer from "../../ws/websocket_player";
-import { CoreMessageTypings } from "@repo/shared/src/message/core_message_type";
+import { CoreMessageTypings } from "@repo/shared";
 
 export type EventObject<E> = {
 	[K in keyof E]: { type: K; data: E[K] };

@@ -1,6 +1,6 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { WebsocketContext } from "../../../context/websocket_context";
-import { AvailableGames, GameTypes } from "@repo/shared/src/struct/game";
+import { AvailableGames, GameTypes, Setting, validateSetting } from "@repo/shared";
 import { WikipediaPageInput } from "../../input/wikipedia_page_input";
 import copy from "../../../resources/copy.svg";
 import share from "../../../resources/share.svg";
@@ -10,6 +10,27 @@ import { WikipediaLanguageInput } from "../../input/wikipedia_language_input";
 export function GameLobby() {
 	const { websocket, forceUpdate } = useContext(WebsocketContext);
 	const { showNotification } = useContext(NotificationContext);
+
+	const [settingsValid, setSettingsValid] = useState<boolean>(false);
+
+	useEffect(() => {
+		const settingsValidations = [];
+
+		const settings = websocket?.getRoom()?.game.settings ?? {};
+		for (const [key, settingUkn] of Object.entries(settings)) {
+			const setting = settingUkn as Setting;
+
+			settingsValidations.push(validateSetting(setting.type, setting.value, key, settings));
+		}
+
+		Promise.all(settingsValidations).then((bools) => {
+			const allValidated = bools.reduce((a, b) => a && b, true);
+
+			console.log(allValidated);
+
+			setSettingsValid(allValidated);
+		});
+	}, [websocket?.getSettingsVersion()]);
 
 	if (!websocket || !websocket.isConnected) {
 		return <></>;
@@ -194,6 +215,7 @@ export function GameLobby() {
 			onClick={() => {
 				websocket?.send("startGame");
 			}}
+			disabled={!settingsValid}
 			className={"bg-lime-300 rounded-xl py-4 px-8 mx-auto mt-4 cursor-pointer disabled:bg-[#140033] disabled:cursor-default"}>Start game
 		</button>}
 	</div>;

@@ -10,6 +10,7 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 	private gameStatus: "lobby" | "playing" | "results" = "lobby";
 	private gameStartedAt: number = 0;
 	private playerId: string | undefined;
+	private settingsVersion: number = 0;
 
 	private gameEventHandler: ((data: {
 		type: string;
@@ -57,6 +58,7 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 
 		this.on("settingUpdated", (data) => {
 			this.room!.game!.settings[data.name].value = data.value;
+			this.settingsVersion++;
 
 			this.forceUpdate();
 		});
@@ -136,6 +138,10 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 
 	public getGameStartedAt() {
 		return this.gameStartedAt;
+	}
+
+	public getSettingsVersion() {
+		return this.settingsVersion;
 	}
 
 	public setGameEventHandler(handler: ((data: {
