@@ -3,6 +3,7 @@ import { Room } from "../struct/room";
 import { WebSocketClient } from "../struct/websocket_client";
 import { RockPaperScissorsGame } from "../struct/game/rps_game";
 import { WikiRaceGame } from "../struct/game/wikirace_game";
+import { BlindtestGame } from "../struct/game/blindtest_game";
 
 function createGame(type: GameTypes, room: Room) {
 	switch (type) {
@@ -11,6 +12,9 @@ function createGame(type: GameTypes, room: Room) {
 			break;
 		case "rps":
 			room.game = new RockPaperScissorsGame(room);
+			break;
+		case "blindtest":
+			room.game = new BlindtestGame(room);
 			break;
 	}
 }

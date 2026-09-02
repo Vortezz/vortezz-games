@@ -4,6 +4,7 @@ import { WebsocketContext } from "../context/websocket_context";
 import { Navigate } from "react-router-dom";
 import { RockPaperScissorsGame } from "../components/game/game_rps";
 import { WikiRaceGame } from "../components/game/game_wikirace";
+import { BlindtestGame } from "../components/game/game_blindtest";
 
 export default function GamePage() {
 	const { websocket } = useContext(WebsocketContext);
@@ -17,6 +18,8 @@ export default function GamePage() {
 		gameComponent = <RockPaperScissorsGame />;
 	} else if (websocket.getRoom()!.game.type === "wikirace") {
 		gameComponent = <WikiRaceGame />;
+	} else if (websocket.getRoom()!.game.type === "blindtest") {
+		gameComponent = <BlindtestGame />;
 	} else {
 		gameComponent = <></>;
 	}

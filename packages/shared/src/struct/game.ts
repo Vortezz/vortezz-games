@@ -99,6 +99,18 @@ export const AvailableGames: Record<string, AvailableGamesType> = {
 			},
 		},
 	},
+	"blindtest": {
+		name: "Blindtest",
+		minPlayers: 1,
+		maxPlayers: 64,
+		settings: {
+			rounds: {
+				name: "Rounds",
+				type: "number",
+				value: 10,
+			},
+		},
+	},
 };
 
 export async function validateSetting(type: SettingType, value: any, name: string, otherSettings: Settings) {
