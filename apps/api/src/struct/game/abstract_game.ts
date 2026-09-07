@@ -49,6 +49,10 @@ export abstract class AbstractGame<E extends CoreMessageTypings> implements Game
 		this.getRoom().broadcast("gameEvent", { type: key as string, data });
 	}
 
+	protected sendGame<K extends keyof E>(websocket: WebSocketClient, key: K, data?: E[K]) {
+		websocket.send("gameEvent", { type: key as string, data });
+	}
+
 	public handleGameEvent(wsClient: WebSocketClient, data: { type: string, data: any }) {
 		// to be overridden
 	}
