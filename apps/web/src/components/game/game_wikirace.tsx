@@ -1,6 +1,6 @@
 import { AbstractGame, EventObject } from "./abstract_game";
 import { JSX, MouseEvent } from "react";
-import { WikiRaceMessageTypings } from "@repo/shared/src/message/game/wikirace_message_type";
+import { WikiRaceMessageTypings } from "@repo/shared";
 import { ResultWikiRace } from "./wikirace/result_wikirace";
 import { TimerComponent } from "./parts/timer";
 import { OverviewContent, WikipediaOverview } from "./wikirace/wikipedia_overview";

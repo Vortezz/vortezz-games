@@ -1,6 +1,6 @@
 import { ReactNode, useState } from "react";
 import { NotificationContext, NotificationType } from "./notification_context";
-import { generateString } from "@repo/shared/src/util/random_util";
+import { generateString } from "@repo/shared";
 import error from "../resources/icons/error.svg";
 import info from "../resources/icons/info.svg";
 import success from "../resources/icons/success.svg";

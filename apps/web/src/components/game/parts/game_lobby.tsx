@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { JSX, useContext, useEffect, useState } from "react";
 import { WebsocketContext } from "../../../context/websocket_context";
 import { AvailableGames, GameTypes, Setting, validateSetting } from "@repo/shared";
 import { WikipediaPageInput } from "../../input/wikipedia_page_input";
