@@ -109,9 +109,27 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 				currentGuess: undefined,
 			});
 		} else if (event.type === "setGuessResult") {
+			const guessInput = document.getElementById("guess");
+
+			if (!guessInput || !(guessInput instanceof HTMLInputElement)) {
+				return;
+			}
+
+			guessInput.value = "";
+
+			const unchanged = this.state.guessResult === undefined || (event.data.artist === this.state.guessResult!.artist && event.data.title === this.state.guessResult!.title) || (!event.data.title && !event.data.artist);
+
+			if (unchanged) {
+				guessInput.classList.add("horizontal-shaking-animation");
+
+				setTimeout(() => {
+					guessInput.classList.remove("horizontal-shaking-animation");
+				}, 550);
+			}
+
 			this.setState({
 				guessResult: event.data,
-				currentGuess: undefined,
+				currentGuess: "",
 			});
 		}
 	}
