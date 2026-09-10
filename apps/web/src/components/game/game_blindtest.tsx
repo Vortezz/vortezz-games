@@ -92,6 +92,7 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 
 							e.target.value = "";
 						}}
+						autocomplete={"off"}
 						id={"guess"} />
 					<VolumeInput volume={this.state.volume}
 						setVolume={(volume) => {
@@ -134,9 +135,10 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 
 			guessInput.value = "";
 
-			const unchanged = this.state.guessResult === undefined || (event.data.artist === this.state.guessResult!.artist && event.data.title === this.state.guessResult!.title) || (!event.data.title && !event.data.artist);
+			const addition = this.state.guessResult === undefined && (event.data.title || event.data.artist)
+				|| this.state.guessResult !== undefined && (event.data.artist !== this.state.guessResult!.artist || event.data.title !== this.state.guessResult!.title);
 
-			if (unchanged) {
+			if (!addition) {
 				guessInput.classList.add("horizontal-shaking-animation");
 
 				setTimeout(() => {
