@@ -21,7 +21,7 @@ def simplify(song):
 
 
 with open("../apps/api/data/blindtest.json", "w") as f:
-    json.dump([simplify(song) for song in data['data']], f)
+    json.dump([simplify(song) for song in data['data'] if song["preview"] != ""], f)
 
 if __name__ == "__main__":
     pass
