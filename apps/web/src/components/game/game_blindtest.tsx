@@ -3,18 +3,30 @@ import { BlindtestMessageTypings, GuessResult, MusicResult } from "@repo/shared"
 import { JSX } from "react";
 import error from "../../resources/icons/error.svg";
 import success from "../../resources/icons/success.svg";
+import { VolumeInput } from "./parts/volume_button";
 
 interface BlindtestState {
 	musicPreview: string | undefined;
 	currentMusic: MusicResult | undefined;
 	currentGuess: string | undefined;
 	guessResult: GuessResult | undefined;
+	volume: number;
 }
 
 export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, BlindtestState> {
 
 	constructor(props: any) {
 		super(props);
+	}
+
+	public componentDidUpdate(_prevProps: Readonly<any>, _prevState: Readonly<BlindtestState>, _snapshot?: any) {
+		const player = document.getElementById("player");
+
+		if (player === null || !(player instanceof HTMLAudioElement)) {
+			return;
+		}
+
+		player.volume = this.state.volume / 100;
 	}
 
 	public renderPlaying(): JSX.Element {
@@ -60,6 +72,7 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 					</div>
 				</div>
 				<audio src={this.state.musicPreview}
+					id={"player"}
 					autoPlay={true} />
 				<form
 					onSubmit={e => {
@@ -69,7 +82,7 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 
 						this.sendGame("guessMusic", guess ?? "");
 					}}
-					className={"flex align-center gap-8 mt-8"}>
+					className={"flex items-center gap-4 mt-8"}>
 					<input
 						value={this.state.currentGuess}
 						onChange={(e) => {
@@ -80,10 +93,14 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 							e.target.value = "";
 						}}
 						id={"guess"} />
-					<button
-						type={"submit"}
-						className={"bg-lime-300 rounded-md py-2 px-4 mx-auto cursor-pointer disabled:bg-[#140033] disabled:cursor-default"}>Guess
-					</button>
+					<VolumeInput volume={this.state.volume}
+						setVolume={(volume) => {
+							this.setState({
+								volume: volume,
+							});
+
+							localStorage.setItem("blindtest.volume", volume.toString());
+						}} />
 				</form>
 			</div>;
 		}
@@ -140,6 +157,7 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 			currentMusic: undefined,
 			currentGuess: undefined,
 			guessResult: undefined,
+			volume: parseInt(localStorage.getItem("blindtest.volume") ?? "100"),
 		};
 	}
 }
