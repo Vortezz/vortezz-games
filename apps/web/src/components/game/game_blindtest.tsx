@@ -92,7 +92,7 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 
 							e.target.value = "";
 						}}
-						autocomplete={"off"}
+						autoComplete={"off"}
 						id={"guess"} />
 					<VolumeInput volume={this.state.volume}
 						setVolume={(volume) => {
