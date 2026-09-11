@@ -14,6 +14,8 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings> {
 	private currentMusicIndex = -1;
 	private currentGoodGuesses: Map<string, GuessResult> = new Map();
 	private points: Map<string, number> = new Map();
+	private wantsToSkip: Map<string, boolean> = new Map();
+	private endRoundTimer: NodeJS.Timeout | undefined;
 
 	public constructor(room: Room) {
 		super(room, "blindtest");
@@ -46,6 +48,17 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings> {
 
 		if (data.type === "guessMusic") {
 			this.handleGuess(wsClient, data.data);
+		}
+
+		if (data.type === "askSkip") {
+			this.wantsToSkip.set(wsClient.getId(), true);
+
+			const skipCount = this.wantsToSkip.size;
+			this.broadcast("skipCount", skipCount);
+
+			if (skipCount >= this.getRoom().players.size) {
+				this.endRound();
+			}
 		}
 	}
 
@@ -108,12 +121,14 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings> {
 
 		this.broadcast("sendMusicPreview", preview);
 
-		setTimeout(() => {
+		this.endRoundTimer = setTimeout(() => {
 			this.endRound();
 		}, 30000);
 	}
 
 	private endRound() {
+		clearTimeout(this.endRoundTimer);
+
 		const music = this.musics[this.currentMusicIndex];
 
 		for (let player of this.room.getPlayers()) {

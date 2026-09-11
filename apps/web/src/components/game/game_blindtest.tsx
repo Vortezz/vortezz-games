@@ -11,6 +11,8 @@ interface BlindtestState {
 	currentGuess: string | undefined;
 	guessResult: GuessResult | undefined;
 	volume: number;
+	currentSkips: number;
+	hasSkipped: boolean;
 }
 
 export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, BlindtestState> {
@@ -74,26 +76,37 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 				<audio src={this.state.musicPreview}
 					id={"player"}
 					autoPlay={true} />
-				<form
-					onSubmit={e => {
-						e.preventDefault();
+				<div className={"flex items-center gap-4 mt-8"}>
+					<button disabled={this.state.hasSkipped}
+						className={"bg-lime-300 rounded-md py-2 px-4 mx-auto cursor-pointer disabled:bg-[#999999] disabled:cursor-default"}
+						onClick={() => {
+							this.sendGame("askSkip");
 
-						const guess = this.state.currentGuess;
-
-						this.sendGame("guessMusic", guess ?? "");
-					}}
-					className={"flex items-center gap-4 mt-8"}>
-					<input
-						value={this.state.currentGuess}
-						onChange={(e) => {
 							this.setState({
-								currentGuess: e.target.value,
+								hasSkipped: true,
 							});
+						}}>SKIP ({this.state.currentSkips}/{this.getRoom().players.size})
+					</button>
+					<form
+						onSubmit={e => {
+							e.preventDefault();
 
-							e.target.value = "";
-						}}
-						autoComplete={"off"}
-						id={"guess"} />
+							const guess = this.state.currentGuess;
+
+							this.sendGame("guessMusic", guess ?? "");
+						}}>
+						<input
+							value={this.state.currentGuess}
+							onChange={(e) => {
+								this.setState({
+									currentGuess: e.target.value,
+								});
+
+								e.target.value = "";
+							}}
+							autoComplete={"off"}
+							id={"guess"} />
+					</form>
 					<VolumeInput volume={this.state.volume}
 						setVolume={(volume) => {
 							this.setState({
@@ -102,7 +115,7 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 
 							localStorage.setItem("blindtest.volume", volume.toString());
 						}} />
-				</form>
+				</div>
 			</div>;
 		}
 
@@ -118,6 +131,8 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 				currentMusic: undefined,
 				currentGuess: undefined,
 				guessResult: undefined,
+				currentSkips: 0,
+				hasSkipped: false,
 			});
 		} else if (event.type === "setMusicResult") {
 			this.setState({
@@ -150,6 +165,10 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 				guessResult: event.data,
 				currentGuess: "",
 			});
+		} else if (event.type === "skipCount") {
+			this.setState({
+				currentSkips: event.data,
+			});
 		}
 	}
 
@@ -160,6 +179,8 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 			currentGuess: undefined,
 			guessResult: undefined,
 			volume: parseInt(localStorage.getItem("blindtest.volume") ?? "100"),
+			currentSkips: 0,
+			hasSkipped: false,
 		};
 	}
 }
