@@ -46,6 +46,15 @@ export default class CoreWebsocketService {
 			} else {
 				room = RoomsService.INSTANCE.getRoom(id ?? "");
 
+				if (room && room.password && !password) {
+					ws.send(JSON.stringify({
+						type: "needsPassword",
+						data: `?id=${id}&name=${name}&needs_password=1`,
+					}));
+					ws.close(3000);
+					return;
+				}
+
 				if (room && !room.checkPassword(password)) {
 					ws.send(JSON.stringify({
 						type: "error",
