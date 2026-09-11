@@ -1,7 +1,8 @@
 import { CoreMessageTypings, GamePlayer, generateString, RoomEvents, RoomTypings } from "@repo/shared";
 import { AbstractGame } from "./game/abstract_game";
 import { WebSocketClient } from "./websocket_client";
-import { RockPaperScissorsGame } from "./game/rps_game";
+import * as crypto from "node:crypto";
+import { WikiRaceGame } from "./game/wikirace_game";
 
 type Handler<E extends keyof RoomEvents> = (data: RoomEvents[E]) => void;
 
@@ -16,12 +17,12 @@ export class Room implements RoomTypings {
 	// eslint-disable-next-line
 	private readonly handlers: Map<keyof RoomEvents, Handler<any>> = new Map<keyof RoomEvents, Handler<any>>();
 
-	game: AbstractGame<CoreMessageTypings> = new RockPaperScissorsGame(this); // TODO : Change this
+	game: AbstractGame<CoreMessageTypings> = new WikiRaceGame(this);
 
 	public constructor(id: string, name: string, password: string | null) {
 		this.id = id;
 		this.name = name;
-		this.password = password;
+		this.password = password ? crypto.hash("sha256", password) : null; // No need for salt as the password is not really stored except in memory
 	}
 
 	/**
@@ -30,7 +31,11 @@ export class Room implements RoomTypings {
 	 * @param password The password to check
 	 */
 	public checkPassword(password: string | null) {
-		return this.password === password;
+		if (password === null) {
+			return this.password === null;
+		}
+
+		return crypto.hash("sha256", password) === this.password;
 	}
 
 	public registerPlayer(name: string, ws: WebSocketClient | undefined, id: string | undefined, owner: boolean | undefined): boolean {

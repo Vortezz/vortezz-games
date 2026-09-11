@@ -45,12 +45,11 @@ export class AbstractWebSocket {
 	}
 
 	public send<E extends CoreMessageTypings, K extends keyof E>(key: K, data?: E[K]) {
-		console.log("Sending", key, data);
 		this.ws.send(JSON.stringify({
 			type: key,
 			data: data,
 		}, function (key, value) {
-			if (key == "ws" || key == "room" || key == "handlers") {
+			if (key === "ws" || key === "room" || key === "handlers" || key === "password") {
 				return undefined;
 			}
 
