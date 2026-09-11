@@ -21,10 +21,12 @@ interface BlindtestMessageTypings extends CoreMessageTypings {
 	sendMusicPreview: string;
 	setMusicResult: MusicResult;
 	setGuessResult: GuessResult;
+	skipCount: number;
 
 	// Clientbound
 	guessMusic: string;
 	nextSong: void;
+	askSkip: void;
 }
 
 export type { BlindtestMessageTypings, Music, MusicResult, GuessResult };
