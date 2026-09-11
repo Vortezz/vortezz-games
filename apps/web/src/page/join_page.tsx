@@ -12,10 +12,10 @@ export default function JoinPage() {
 	}
 
 	const id = searchParams.get("id") ?? "";
+	const defaultName = searchParams.get("name") ?? "";
+	const needsPassword = searchParams.has("needs_password");
 
-	const [name, setName] = useState("");
-	// @ts-ignore
-	const [needsPassword, setNeedsPassword] = useState(false);
+	const [name, setName] = useState(defaultName);
 	const [password, setPassword] = useState<undefined | string>(undefined);
 
 	return <LayoutPage>

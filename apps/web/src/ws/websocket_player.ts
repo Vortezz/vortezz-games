@@ -112,6 +112,12 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 		this.on("error", (error) => {
 			this.showNotification("error", error);
 		});
+
+		this.on("needsPassword", (data) => {
+			this.showNotification("info", "This room needs a password");
+
+			router.navigate(`/join${data}`);
+		});
 	}
 
 	public isConnected() {

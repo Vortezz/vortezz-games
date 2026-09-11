@@ -20,6 +20,7 @@ interface CoreMessageTypings {
 	}[];
 	self: string;
 	error: string;
+	needsPassword: string;
 
 	// Clientbound
 	ping: void;
