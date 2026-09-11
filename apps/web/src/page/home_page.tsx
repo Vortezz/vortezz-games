@@ -1,6 +1,7 @@
 import LayoutPage from "./layout_page";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import arrowRight from "../resources/icons/arrow-right.svg";
 
 function replaceCharacter(string: string, index: number, replacement: string) {
 	return string.substring(0, index) + replacement + string.substring(index + replacement.length);
@@ -53,6 +54,24 @@ function CodeInput({ id, code, setCode }: { id: number, code: string, setCode: (
 				nextInput.focus();
 			}
 		}}
+		onKeyDown={(e) => {
+			if (e.key !== "Backspace" || id === 0) {
+				return;
+			}
+
+			e.preventDefault();
+			let newCode = code;
+			newCode = replaceCharacter(newCode, id, " ");
+			setCode(newCode);
+
+			const currentInput = e.target as HTMLInputElement;
+			currentInput.value = "";
+
+			const nextInput = document.getElementById(`code-input-${id - 1}`) as HTMLInputElement;
+			if (nextInput) {
+				nextInput.focus();
+			}
+		}}
 		className={"h-20 w-20 text-center text-white text-3xl rounded-xl border border-[#676767] bg-[#32006F]"}></input>;
 }
 
@@ -80,11 +99,15 @@ export default function HomePage() {
 					code={code}
 					setCode={setCode}
 					key={id} />)}
-				<button className={"h-20 w-20 rounded-xl border bg-[#FF4882]"}
+				<button className={"h-20 w-20 rounded-xl border bg-[#FF4882] cursor-pointer disabled:cursor-not-allowed disabled:opacity-20"}
 					disabled={code.includes(" ")}
 					onClick={() => {
 						navigate(`/join?id=${code}`);
-					}}></button>
+					}}>
+					{!code.includes(" ") && <img src={arrowRight}
+						className={`h-12 w-12 m-auto`} />}
+
+				</button>
 			</div>
 		</div>
 	</LayoutPage>;

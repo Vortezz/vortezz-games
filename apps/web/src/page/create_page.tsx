@@ -11,10 +11,7 @@ export default function CreatePage() {
 	const [password, setPassword] = useState<undefined | string>(undefined);
 
 	return <LayoutPage>
-		<div className={"m-auto flex flex-col gap-4 p-8 bg-[#32006F] rounded-md rounded-xl border border-[#232323]"}
-			style={{
-				background: "linear-gradient(270deg, #230058 0%, #140033 48.56%, #0E0023 100%)",
-			}}>
+		<div className={"m-auto flex flex-col gap-4 p-8 bg-[#32006F] rounded-md rounded-xl border border-[#232323] gradient-reverse"}>
 			<h3>Create a game</h3>
 			<div>
 				<label htmlFor={"roomName"}>Room name</label>
