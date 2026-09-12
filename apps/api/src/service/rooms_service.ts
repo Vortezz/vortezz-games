@@ -53,90 +53,128 @@ export default class RoomsService {
 
 		const otherPlayers = room.getPlayers();
 
-		const isOwner = room.registerPlayer(name, wsClient, id, undefined);
+		room.registerPlayer(name, wsClient, id, undefined);
 
 		wsClient.send("self", id);
 		wsClient.send("roomData", room);
 
-		if (isOwner) {
-			wsClient.on("startGame", () => {
-				const gameType = AvailableGames[room.game.type];
+		wsClient.on("startGame", () => {
+			if (!this.isOwner(room, wsClient)) {
+				return;
+			}
 
-				if (gameType.minPlayers > room.players.size
-					|| room.players.size > gameType.maxPlayers) {
-					wsClient.send("error", "Invalid player count");
+			const gameType = AvailableGames[room.game.type];
+
+			if (gameType.minPlayers > room.players.size
+				|| room.players.size > gameType.maxPlayers) {
+				wsClient.send("error", "Invalid player count");
+				return;
+			}
+
+			this.startGame(room);
+		});
+
+		wsClient.on("setType", (type) => {
+			if (!this.isOwner(room, wsClient)) {
+				return;
+			}
+
+			createGame(type, room);
+
+			room.broadcast("roomData", room);
+		});
+
+		wsClient.on("setSetting", change => {
+			if (!this.isOwner(room, wsClient)) {
+				return;
+			}
+
+			const setting = room.game.settings[change.name];
+
+			if (!setting) {
+				wsClient.send("error", "Invalid setting");
+				return;
+			}
+
+			if (setting.value === change.value) {
+				return;
+			}
+
+			validateSetting(setting.type, change.value, change.name, room.game.settings).then(bool => {
+				if (!bool) {
 					return;
 				}
 
-				this.startGame(room);
+				setting.value = change.value;
+
+				room.game.handleSettingChange(change.name, change.value);
+
+				room.broadcast("settingUpdated", change);
 			});
+		});
 
-			wsClient.on("setType", (type) => {
-				createGame(type, room);
+		wsClient.on("resetGame", () => {
+			if (!this.isOwner(room, wsClient)) {
+				return;
+			}
 
-				room.broadcast("roomData", room);
-			});
+			const settings = room.game.settings;
 
-			wsClient.on("setSetting", change => {
-				const setting = room.game.settings[change.name];
+			createGame(room.game.type, room);
 
-				if (!setting) {
-					wsClient.send("error", "Invalid setting");
-					return;
-				}
+			room.game.settings = settings;
 
-				if (setting.value === change.value) {
-					return;
-				}
+			room.broadcast("roomData", room);
+		});
 
-				validateSetting(setting.type, change.value, change.name, room.game.settings).then(bool => {
-					if (!bool) {
-						return;
-					}
+		wsClient.on("kickPlayer", (data) => {
+			if (!this.isOwner(room, wsClient)) {
+				return;
+			}
 
-					setting.value = change.value;
+			if (data === wsClient.getId()) {
+				return;
+			}
 
-					room.game.handleSettingChange(change.name, change.value);
+			const player = room.players.get(data);
+			if (!player) {
+				return;
+			}
 
-					room.broadcast("settingUpdated", change);
-				});
-			});
+			room.players.delete(data);
 
-			wsClient.on("resetGame", () => {
-				const settings = room.game.settings;
+			const ws = player.ws!;
+			ws.close(4001); // Kick code
 
-				createGame(room.game.type, room);
-
-				room.game.settings = settings;
-
-				room.broadcast("roomData", room);
-			});
-
-			wsClient.on("kickPlayer", (data) => {
-				const player = room.players.get(data);
-				if (!player) {
-					return;
-				}
-
-				room.players.delete(data);
-
-				const ws = player.ws!;
-				ws.close(4001); // Kick code
-
-				room.broadcast("playerKicked", data);
-			});
-		}
+			room.broadcast("playerKicked", data);
+		});
 
 		wsClient.on("ping", () => wsClient.send("pong"));
 		wsClient.on("gameEvent", (data) => room.handleGameEvent(wsClient, data));
 
 		wsClient.on("leaveGame", () => {
 			const clientId = wsClient.getId();
+
+			const player = room.players.get(clientId);
+			if (!player) {
+				return;
+			}
+
 			room.players.delete(clientId);
 
 			wsClient.close(4002); // Left game
 
 			room.broadcast("playerLeft", clientId);
+
+			if (room.players.size === 0) {
+				this.currentRooms.delete(room.getId());
+			} else if (player.owner) {
+				const newOwner = room.getPlayers()[0];
+
+				newOwner.owner = true;
+
+				room.broadcast("newOwner", newOwner.id);
+			}
 		});
 
 		otherPlayers.forEach(player => player.ws?.send("playerJoined", room.getPlayers().pop()));
@@ -144,6 +182,12 @@ export default class RoomsService {
 		room.game.registerClient(wsClient);
 
 		console.log(`[${"INFO / Room".blue}] Player ${name} joined room ${room.id}`);
+	}
+
+	private isOwner(room: Room, wsClient: WebSocketClient) {
+		const playerSender = room.players.get(wsClient.getId());
+
+		return playerSender && playerSender.owner;
 	}
 
 	private async startGame(room: Room) {

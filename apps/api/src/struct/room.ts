@@ -38,14 +38,12 @@ export class Room implements RoomTypings {
 		return crypto.hash("sha256", password) === this.password;
 	}
 
-	public registerPlayer(name: string, ws: WebSocketClient | undefined, id: string | undefined, owner: boolean | undefined): boolean {
+	public registerPlayer(name: string, ws: WebSocketClient | undefined, id: string | undefined, owner: boolean | undefined): void {
 		if (this.game.isGameStarted()) {
 			if (ws) {
 				ws.send("error", "Game already started");
 				ws.close(3000);
 			}
-
-			return false;
 		}
 
 		let realId = id;
@@ -64,8 +62,6 @@ export class Room implements RoomTypings {
 			owner: realOwner,
 			ws: ws,
 		});
-
-		return realOwner;
 	}
 
 	public getGame() {

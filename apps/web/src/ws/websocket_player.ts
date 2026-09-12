@@ -109,6 +109,19 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 			this.showNotification("exit", `${player.name} was kicked`);
 		});
 
+		this.on("newOwner", (data) => {
+			const player = this.room?.players.get(data);
+			if (!player) {
+				return;
+			}
+
+			player.owner = true;
+
+			this.forceUpdate();
+
+			this.showNotification("info", `${player.name} is the new owner`);
+		});
+
 		this.on("gameStarted", () => {
 			this.gameStatus = "playing";
 			this.gameStartedAt = Date.now();

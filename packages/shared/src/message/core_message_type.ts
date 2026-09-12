@@ -8,6 +8,7 @@ interface CoreMessageTypings {
 	playerJoined: GamePlayer,
 	playerLeft: string,
 	playerKicked: string
+	newOwner: string;
 	gameStarted: void;
 	gameEnded: void;
 	settingUpdated: {
