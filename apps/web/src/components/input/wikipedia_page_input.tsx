@@ -64,8 +64,8 @@ export function WikipediaPageInput({ value, setValue, disabled, lang }: { value:
 				onChange={(e) => setSearchText(e.target.value)} />
 			<img src={random}
 				alt={"Random"}
-				className={"h-5 my-auto px-3 cursor-pointer"}
-				onClick={() => {
+				className={`h-5 my-auto px-3 ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+				onClick={disabled ? undefined : () => {
 					fetch(`https://${lang}.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*`)
 						.then(response => response.json())
 						.then(data => {
