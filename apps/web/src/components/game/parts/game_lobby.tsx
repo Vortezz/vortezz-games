@@ -4,6 +4,7 @@ import { AvailableGames, GameTypes, Setting, validateSetting } from "@repo/share
 import { WikipediaPageInput } from "../../input/wikipedia_page_input";
 import copy from "../../../resources/copy.svg";
 import share from "../../../resources/share.svg";
+import crown from "../../../resources/icons/crown.svg";
 import { NotificationContext } from "../../../context/notification_context";
 import { WikipediaLanguageInput } from "../../input/wikipedia_language_input";
 
@@ -65,9 +66,16 @@ export function GameLobby() {
 		<div className={"flex mx-auto w-240 gap-8"}>
 			<div className={"w-108"}>
 				<h3>Players</h3>
-				<div className={"mt-4"}>
+				<div className={"mt-4 flex flex-col gap-2"}>
 					{[...websocket.getRoom()?.players.values() ?? []].map((player, id) => {
-						return <p key={id}>{player.name}</p>;
+						return <div className={"flex items-center gap-2"}
+							key={id}>
+							<p>{player.name}</p>
+							{player.owner && <img src={crown}
+								alt={"👑"}
+								className={"h-4 w-4"} />}
+							{player.id === websocket.getPlayerId() && <span className={"text-gray-400"}>(YOU)</span>}
+						</div>;
 					})}
 				</div>
 			</div>

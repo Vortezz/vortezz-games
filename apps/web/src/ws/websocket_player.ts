@@ -150,6 +150,10 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 		return this.settingsVersion;
 	}
 
+	public getPlayerId() {
+		return this.playerId;
+	}
+
 	public setGameEventHandler(handler: ((data: {
 		type: string,
 		data: any
