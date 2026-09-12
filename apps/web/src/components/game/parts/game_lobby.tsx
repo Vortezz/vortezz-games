@@ -1,15 +1,14 @@
-import { JSX, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { WebsocketContext } from "../../../context/websocket_context";
 import { AvailableGames, GameTypes, Setting, validateSetting } from "@repo/shared";
-import { WikipediaPageInput } from "../../input/wikipedia_page_input";
 import copy from "../../../resources/copy.svg";
 import share from "../../../resources/share.svg";
 import crown from "../../../resources/icons/crown.svg";
 import { NotificationContext } from "../../../context/notification_context";
-import { WikipediaLanguageInput } from "../../input/wikipedia_language_input";
+import SettingInput from "../../input/setting_input";
 
 export function GameLobby() {
-	const { websocket, forceUpdate } = useContext(WebsocketContext);
+	const { websocket } = useContext(WebsocketContext);
 	const { showNotification } = useContext(NotificationContext);
 
 	const [settingsValid, setSettingsValid] = useState<boolean>(false);
@@ -27,8 +26,6 @@ export function GameLobby() {
 		Promise.all(settingsValidations).then((bools) => {
 			const allValidated = bools.reduce((a, b) => a && b, true);
 
-			console.log(allValidated);
-
 			setSettingsValid(allValidated);
 		});
 	}, [websocket?.getSettingsVersion()]);
@@ -36,6 +33,9 @@ export function GameLobby() {
 	if (!websocket || !websocket.isConnected) {
 		return <></>;
 	}
+
+	const gameType = AvailableGames[websocket.getRoom()!.game.type];
+	const playerCount = websocket.getRoom()!.players.size;
 
 	return <div className={"game-container gradient-reverse"}>
 		<div className={"flex items-center justify-between w-full"}>
@@ -65,7 +65,10 @@ export function GameLobby() {
 		<hr className={"text-[#676767]"} />
 		<div className={"flex mx-auto w-240 gap-8"}>
 			<div className={"w-108"}>
-				<h3>Players</h3>
+				<div className={"flex items-center gap-2"}>
+					<h3>Players</h3>
+					<span className={"text-gray-400 text-sm"}>(MIN. {gameType.minPlayers}, MAX. {gameType.maxPlayers})</span>
+				</div>
 				<div className={"mt-4 flex flex-col gap-2"}>
 					{[...websocket.getRoom()?.players.values() ?? []].map((player, id) => {
 						return <div className={"flex items-center gap-2"}
@@ -105,123 +108,8 @@ export function GameLobby() {
 					})}
 				</select>
 				{Object.entries(websocket?.getRoom()?.game.settings ?? {}).map(([id, settings]) => {
-					let settingInput: JSX.Element;
-
-					if (settings.type === "wikipage") {
-						settingInput = <>
-							<label htmlFor={id}>{settings.name}</label>
-							<WikipediaPageInput value={settings.value}
-								setValue={websocket.isRoomOwner() ? (value) => {
-									if (value === settings.value) {
-										return;
-									}
-
-									websocket.send("setSetting", {
-										name: id,
-										value: value,
-									});
-
-									settings.value = value;
-
-									forceUpdate();
-								} : () => {
-								}}
-								lang={websocket?.getRoom()?.game.settings.language.value ?? "en"}
-								disabled={!websocket.isRoomOwner()} />
-						</>;
-					} else if (settings.type === "wikilanguage") {
-						settingInput = <>
-							<label htmlFor={id}>{settings.name}</label>
-							<WikipediaLanguageInput value={settings.value}
-								setValue={(value) => {
-									if (value === settings.value) {
-										return;
-									}
-
-									websocket.send("setSetting", {
-										name: id,
-										value: value,
-									});
-								}}
-								disabled={!websocket.isRoomOwner()} />
-						</>;
-					} else if (settings.type === "boolean") {
-						settingInput = <div className={"flex items-center gap-4"}>
-							<input type={"checkbox"}
-								className={"h-4 p-0 w-4"}
-								id={id}
-								checked={settings.value}
-								onChange={websocket.isRoomOwner() ? (e) => {
-									const value = e.target.checked;
-
-									if (value === settings.value) {
-										return;
-									}
-
-									websocket.send("setSetting", {
-										name: id,
-										value: value,
-									});
-								} : undefined}
-								disabled={!websocket.isRoomOwner()} />
-							<label htmlFor={id}
-								className={"h-fit"}>{settings.name}</label>
-						</div>;
-					} else if (settings.type === "choice") {
-						settingInput = <>
-							<label htmlFor={id}>{settings.name}</label>
-							<select id={id}
-								value={settings.value}
-								disabled={!websocket.isRoomOwner()}
-								onChange={(e) => {
-									const value = e.target.value;
-
-									if (value === settings.value) {
-										return;
-									}
-
-									websocket.send("setSetting", {
-										name: id,
-										value: value,
-									});
-								}}>
-								{settings.data!.map((choice) => {
-									return <option id={choice.name}
-										key={choice.id}
-										value={choice.id}>{choice.name}</option>;
-								})}
-							</select>
-						</>;
-					} else {
-						settingInput = <>
-							<label htmlFor={id}>{settings.name}</label>
-							<input type={settings.type}
-								id={id}
-								disabled={!websocket.isRoomOwner()}
-								value={settings.value}
-								onChange={websocket.isRoomOwner() ? (e) => {
-									let value: any = e.target.value;
-
-									if (settings.type === "number") {
-										value = parseInt(value, 10);
-									}
-
-									if (value === settings.value) {
-										return;
-									}
-
-									websocket.send("setSetting", {
-										name: id,
-										value: value,
-									});
-								} : undefined} />
-						</>;
-					}
-
-					return <div className={"mt-4"}
-						key={id}>
-						{settingInput}
-					</div>;
+					return <SettingInput settings={settings}
+						id={id} />;
 				})}
 			</div>
 		</div>
@@ -229,7 +117,9 @@ export function GameLobby() {
 			onClick={() => {
 				websocket?.send("startGame");
 			}}
-			disabled={!settingsValid}
+			disabled={!settingsValid
+				|| gameType.minPlayers > playerCount
+				|| playerCount > gameType.maxPlayers}
 			className={"bg-lime-300 rounded-xl py-4 px-8 mx-auto mt-4 cursor-pointer disabled:bg-[#140033] disabled:cursor-default"}>Start game
 		</button>}
 	</div>;

@@ -1,4 +1,4 @@
-import { GameTypes, generateString, Setting, validateSetting } from "@repo/shared";
+import { AvailableGames, GameTypes, generateString, Setting, validateSetting } from "@repo/shared";
 import { Room } from "../struct/room";
 import { WebSocketClient } from "../struct/websocket_client";
 import { RockPaperScissorsGame } from "../struct/game/rps_game";
@@ -59,7 +59,17 @@ export default class RoomsService {
 		wsClient.send("roomData", room);
 
 		if (isOwner) {
-			wsClient.on("startGame", () => this.startGame(room));
+			wsClient.on("startGame", () => {
+				const gameType = AvailableGames[room.game.type];
+
+				if (gameType.minPlayers > room.players.size
+					|| room.players.size > gameType.maxPlayers) {
+					wsClient.send("error", "Invalid player count");
+					return;
+				}
+
+				this.startGame(room);
+			});
 
 			wsClient.on("setType", (type) => {
 				createGame(type, room);
