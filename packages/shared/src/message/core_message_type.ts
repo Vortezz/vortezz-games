@@ -34,6 +34,7 @@ interface CoreMessageTypings {
 	};
 	resetGame: void;
 	kickPlayer: string;
+	leaveGame: void;
 
 	// Both
 	gameEvent: {

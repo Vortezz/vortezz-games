@@ -29,6 +29,12 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 				return;
 			}
 
+			if (e.code === 4002) { // Leave
+				router.navigate("/");
+				showNotification("success", "You left the game");
+				return;
+			}
+
 			if (e.code !== 3000) {
 				showNotification("error", "Unexpected error occurred");
 				router.navigate("/");

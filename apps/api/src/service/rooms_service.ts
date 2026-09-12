@@ -130,6 +130,15 @@ export default class RoomsService {
 		wsClient.on("ping", () => wsClient.send("pong"));
 		wsClient.on("gameEvent", (data) => room.handleGameEvent(wsClient, data));
 
+		wsClient.on("leaveGame", () => {
+			const clientId = wsClient.getId();
+			room.players.delete(clientId);
+
+			wsClient.close(4002); // Left game
+
+			room.broadcast("playerLeft", clientId);
+		});
+
 		otherPlayers.forEach(player => player.ws?.send("playerJoined", room.getPlayers().pop()));
 
 		room.game.registerClient(wsClient);

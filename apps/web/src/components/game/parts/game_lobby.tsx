@@ -113,14 +113,22 @@ export function GameLobby() {
 				})}
 			</div>
 		</div>
-		{websocket.isRoomOwner() && <button
-			onClick={() => {
-				websocket?.send("startGame");
-			}}
-			disabled={!settingsValid
-				|| gameType.minPlayers > playerCount
-				|| playerCount > gameType.maxPlayers}
-			className={"bg-lime-300 rounded-xl py-4 px-8 mx-auto mt-4 cursor-pointer disabled:bg-[#140033] disabled:cursor-default"}>Start game
-		</button>}
+		<div className={"flex gap-8"}>
+			{websocket.isRoomOwner() && <button
+				onClick={() => {
+					websocket?.send("startGame");
+				}}
+				disabled={!settingsValid
+					|| gameType.minPlayers > playerCount
+					|| playerCount > gameType.maxPlayers}
+				className={"bg-lime-300 rounded-xl py-4 px-8 mx-auto mt-4 cursor-pointer disabled:bg-[#140033] disabled:cursor-default"}>Start game
+			</button>}
+			<button
+				onClick={() => {
+					websocket?.send("leaveGame");
+				}}
+				className={"bg-red-300 rounded-xl py-4 px-8 mx-auto mt-4 cursor-pointer disabled:bg-[#140033] disabled:cursor-default"}>Leave game
+			</button>
+		</div>
 	</div>;
 }
