@@ -23,6 +23,12 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 		super(ws);
 
 		ws.addEventListener("close", (e) => {
+			if (e.code === 4001) { // Kick
+				router.navigate("/");
+				showNotification("warning", "You were kicked from the game");
+				return;
+			}
+
 			if (e.code !== 3000) {
 				showNotification("error", "Unexpected error occurred");
 				router.navigate("/");
@@ -72,11 +78,29 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 		});
 
 		this.on("playerLeft", (data) => {
-			this.room?.players.delete(data.id);
+			const player = this.room?.players.get(data);
+			if (!player) {
+				return;
+			}
+
+			this.room?.players.delete(data);
 
 			this.forceUpdate();
 
-			this.showNotification("exit", `${data.name} left`);
+			this.showNotification("exit", `${player.name} left`);
+		});
+
+		this.on("playerKicked", (data) => {
+			const player = this.room?.players.get(data);
+			if (!player) {
+				return;
+			}
+
+			this.room?.players.delete(data);
+
+			this.forceUpdate();
+
+			this.showNotification("exit", `${player.name} was kicked`);
 		});
 
 		this.on("gameStarted", () => {

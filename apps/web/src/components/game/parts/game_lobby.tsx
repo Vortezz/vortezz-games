@@ -70,7 +70,10 @@ export function GameLobby() {
 					{[...websocket.getRoom()?.players.values() ?? []].map((player, id) => {
 						return <div className={"flex items-center gap-2"}
 							key={id}>
-							<p>{player.name}</p>
+							<p className={websocket.isRoomOwner() && websocket.getPlayerId() !== player.id ? "hover:line-through cursor-pointer" : undefined}
+								onClick={websocket.isRoomOwner() && websocket.getPlayerId() !== player.id ? () => {
+									websocket.send("kickPlayer", player.id);
+								} : undefined}>{player.name}</p>
 							{player.owner && <img src={crown}
 								alt={"👑"}
 								className={"h-4 w-4"} />}

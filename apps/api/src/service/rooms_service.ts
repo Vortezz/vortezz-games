@@ -101,6 +101,20 @@ export default class RoomsService {
 
 				room.broadcast("roomData", room);
 			});
+
+			wsClient.on("kickPlayer", (data) => {
+				const player = room.players.get(data);
+				if (!player) {
+					return;
+				}
+
+				room.players.delete(data);
+
+				const ws = player.ws!;
+				ws.close(4001); // Kick code
+
+				room.broadcast("playerKicked", data);
+			});
 		}
 
 		wsClient.on("ping", () => wsClient.send("pong"));

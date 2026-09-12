@@ -6,7 +6,8 @@ interface CoreMessageTypings {
 	pong: void;
 	roomData: RoomTypings;
 	playerJoined: GamePlayer,
-	playerLeft: GamePlayer,
+	playerLeft: string,
+	playerKicked: string
 	gameStarted: void;
 	gameEnded: void;
 	settingUpdated: {
@@ -32,6 +33,7 @@ interface CoreMessageTypings {
 		value: any;
 	};
 	resetGame: void;
+	kickPlayer: string;
 
 	// Both
 	gameEvent: {
