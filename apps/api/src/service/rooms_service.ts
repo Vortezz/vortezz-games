@@ -39,6 +39,8 @@ export default class RoomsService {
 
 		this.currentRooms.set(id, room);
 
+		console.log(`[${"INFO / Room".blue}] Room ${room.id} created`);
+
 		return room;
 	}
 
@@ -108,7 +110,7 @@ export default class RoomsService {
 
 		room.game.registerClient(wsClient);
 
-		console.log("Registered");
+		console.log(`[${"INFO / Room".blue}] Player ${name} joined room ${room.id}`);
 	}
 
 	private async startGame(room: Room) {

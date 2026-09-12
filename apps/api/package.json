@@ -20,6 +20,7 @@
 	"dependencies": {
 		"@repo/shared": "workspace:*",
 		"@types/ws": "^8.18.1",
+		"colorts": "^0.1.63",
 		"ws": "^8.18.3"
 	}
 }
