@@ -18,6 +18,10 @@ export class TimerComponent extends Component<TimerComponentProps> {
 	}
 
 	public componentDidMount() {
+		return this.componentDidUpdate();
+	}
+
+	public componentDidUpdate() {
 		const interval = setInterval(() => {
 			this.forceUpdate();
 		}, 400);

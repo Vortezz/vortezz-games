@@ -179,17 +179,18 @@ export function ResultWikiRace({ paths, startPage, endPage, players, finishedAt,
 			{paths
 				.sort((a, b) => {
 					if (settings.ranking.value === "fastest") {
-						return (finishedAt.get(a.id) ?? 1e10) - (finishedAt.get(b.id) ?? 1e10);
+						return (finishedAt.get(a.id) ?? 1e20) - (finishedAt.get(b.id) ?? 1e20);
 					} else {
 						return a.pages.length - b.pages.length;
 					}
 				})
-				.map((path) => <tr>
+				.map((path) => <tr key={path.id}
+					className={"border-b-white border-b border-0.5"}>
 					<td>{players.get(path.id)!.name}</td>
 					<td><TimerComponent startedAt={startedAt}
 						finishedAt={finishedAt.get(path.id)} /></td>
 					<td>{path.pages.length - 1}</td>
-					<td>{path.pages.join(" → ")}</td>
+					<td className={"py-2"}>{path.pages.join(" → ")}</td>
 				</tr>)}
 			</tbody>
 		</table>
