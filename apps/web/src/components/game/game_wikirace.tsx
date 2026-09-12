@@ -213,6 +213,8 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 	}
 
 	protected handleData(event: EventObject<WikiRaceMessageTypings>) {
+		super.handleData(event);
+
 		if (event.type === "currentPaths") {
 			this.setState({
 				paths: event.data,

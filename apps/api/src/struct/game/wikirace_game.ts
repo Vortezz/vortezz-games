@@ -27,6 +27,25 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 		this.pathsTaken.set(ws.getId(), []);
 	}
 
+	public getState(id: string): any {
+		const path = this.pathsTaken.get(id);
+
+		let currentPage = this.settings.startPage.value;
+		if (path) {
+			currentPage = path[path.length - 1];
+		}
+
+		return {
+			currentPage: currentPage,
+			finished: this.finishedAt.has(id),
+			finishedAt: this.finishedAt,
+			paths: [...this.pathsTaken.entries()].map((item) => ({
+				id: item[0],
+				pages: item[1],
+			})),
+		};
+	}
+
 	public handleGameEvent(wsClient: WebSocketClient, data: { type: string, data: any }) {
 		if (data.type === "changePage") {
 			const id = wsClient.getId();

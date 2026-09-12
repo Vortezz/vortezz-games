@@ -32,6 +32,8 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 	}
 
 	public renderPlaying(): JSX.Element {
+		console.log(this.state);
+
 		if (this.state.currentMusic !== undefined) {
 			return <div className={"game-container gradient-reverse"}>
 				<h2>You got {this.state.currentMusic.points} point{this.state.currentMusic.points > 1 ? "s" : ""}!</h2>
@@ -120,11 +122,13 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 		}
 
 		return <div className={"game-container gradient-reverse"}>
-			<p>Loading</p>
+			<p>Loading...</p>
 		</div>;
 	}
 
 	protected handleData(event: EventObject<BlindtestMessageTypings>) {
+		super.handleData(event);
+
 		if (event.type === "sendMusicPreview") {
 			this.setState({
 				musicPreview: event.data,

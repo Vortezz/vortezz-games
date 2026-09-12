@@ -8,6 +8,10 @@ export class RockPaperScissorsGame extends AbstractGame<RpsMessageTypings> {
 	private picks: Map<string, RpsPossibilites> = new Map<string, RpsPossibilites>();
 	private scores: Map<string, number> = new Map<string, number>();
 	private playable: boolean = false;
+	private result: {
+		winner: string | undefined,
+		picks: Map<string, RpsPossibilites>;
+	} | undefined;
 
 	public constructor(room: Room) {
 		super(room, "rps");
@@ -54,11 +58,14 @@ export class RockPaperScissorsGame extends AbstractGame<RpsMessageTypings> {
 		const scoreB = this.scores.get(playerB) ?? 0;
 
 		this.broadcast("setScore", this.scores);
-		this.broadcast("result", { winner: winner, picks: new Map(this.picks) });
+		this.result = { winner: winner, picks: new Map(this.picks) };
+		this.broadcast("result", this.result);
 
 		this.picks.clear();
 
 		setTimeout(() => {
+			this.result = undefined;
+
 			if (Math.max(scoreA, scoreB) >= this.settings.pointsToWin.value) {
 				this.getRoom().broadcast("setResults", [...this.room.players.entries()].map(entry => {
 					const id = entry[0];
@@ -87,6 +94,15 @@ export class RockPaperScissorsGame extends AbstractGame<RpsMessageTypings> {
 
 	public registerClient(ws: WebSocketClient) {
 		this.scores.set(ws.getId(), 0);
+	}
+
+	public getState(id: string) {
+		return {
+			playable: this.playable,
+			result: this.result,
+			score: this.scores,
+			pick: this.picks.get(id),
+		};
 	}
 
 	public handleGameEvent(wsClient: WebSocketClient, data: { type: string, data: any }) {

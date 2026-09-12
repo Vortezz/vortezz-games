@@ -1,4 +1,4 @@
-import { AbstractWebSocket, RoomTypings } from "@repo/shared";
+import { AbstractWebSocket, GameStatus, RoomTypings } from "@repo/shared";
 import { router } from "../router";
 import { NotificationType } from "../context/notification_context";
 
@@ -7,7 +7,7 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 	private readonly forceUpdate: () => void;
 	private readonly showNotification: (type: NotificationType, message: string) => void;
 	private room: RoomTypings | undefined;
-	private gameStatus: "lobby" | "playing" | "results" = "lobby";
+	private gameStatus: GameStatus = "lobby";
 	private gameStartedAt: number = 0;
 	private playerId: string | undefined;
 	private settingsVersion: number = 0;
@@ -16,8 +16,6 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 		type: string;
 		data: any;
 	}) => void) | undefined;
-
-	// TODO : Load self
 
 	constructor(ws: WebSocket, forceUpdate: () => void, showNotification: (type: NotificationType, message: string) => void) {
 		super(ws);
@@ -32,6 +30,11 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 			if (e.code === 4002) { // Leave
 				router.navigate("/");
 				showNotification("success", "You left the game");
+				return;
+			}
+
+			if (e.code === 4003) { // Failed to rejoin
+				localStorage.removeItem("lastGame");
 				return;
 			}
 
@@ -61,6 +64,12 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 		this.on("roomData", (data) => {
 			this.room = data;
 
+			localStorage.setItem("lastGame", JSON.stringify({
+				playerId: this.playerId,
+				roomId: this.room.id,
+				timestamp: Date.now(),
+			}));
+
 			if (window.location.pathname !== "/game") {
 				router.navigate("/game");
 			} else {
@@ -83,6 +92,24 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 			this.showNotification("enter", `${data.name} joined`);
 		});
 
+		this.on("playerDisconnected", (data) => {
+			const player = this.room?.players.get(data);
+			if (!player) {
+				return;
+			}
+
+			this.showNotification("warning", `${player.name} has disconnected, they have 30 seconds to reconnect`);
+		});
+
+		this.on("playerRejoined", (data) => {
+			const player = this.room?.players.get(data);
+			if (!player) {
+				return;
+			}
+
+			this.showNotification("enter", `${player.name} has rejoined`);
+		});
+
 		this.on("playerLeft", (data) => {
 			const player = this.room?.players.get(data);
 			if (!player) {
@@ -93,7 +120,7 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 
 			this.forceUpdate();
 
-			this.showNotification("exit", `${player.name} left`);
+			this.showNotification("exit", `${player.name} has left`);
 		});
 
 		this.on("playerKicked", (data) => {
@@ -160,6 +187,16 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 			this.showNotification("info", "This room needs a password");
 
 			router.navigate(`/join${data}`);
+		});
+
+		this.on("statusSync", (status) => this.setGameStatus(status));
+
+		this.on("pong", () => {
+			localStorage.setItem("lastGame", JSON.stringify({
+				playerId: this.playerId,
+				roomId: this.room!.id,
+				timestamp: Date.now(),
+			}));
 		});
 	}
 

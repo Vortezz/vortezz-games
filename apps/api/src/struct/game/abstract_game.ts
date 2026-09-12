@@ -33,6 +33,8 @@ export abstract class AbstractGame<E extends CoreMessageTypings> implements Game
 		// to be overridden
 	}
 
+	public abstract getState(id: string): any;
+
 	public getType() {
 		return this.type;
 	}

@@ -17,6 +17,8 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings> {
 	private wantsToSkip: Map<string, boolean> = new Map();
 	private endRoundTimer: NodeJS.Timeout | undefined;
 
+	private currentPreview: string | undefined;
+
 	public constructor(room: Room) {
 		super(room, "blindtest");
 	}
@@ -37,6 +39,16 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings> {
 	}
 
 	public registerClient(ws: WebSocketClient) {
+	}
+
+	public getState(id: string) {
+		return {
+			musicPreview: this.currentPreview,
+			currentMusic: this.currentPreview ? undefined : this.musics[this.currentMusicIndex],
+			guessResult: this.currentGoodGuesses.get(id),
+			currentSkips: this.wantsToSkip.size,
+			hasSkipped: this.wantsToSkip.has(id),
+		};
 	}
 
 	public handleGameEvent(wsClient: WebSocketClient, data: { type: string, data: any }) {
@@ -118,6 +130,7 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings> {
 		const jsonApiResponse = await apiResponse.json();
 
 		const preview = jsonApiResponse.preview;
+		this.currentPreview = preview;
 
 		this.broadcast("sendMusicPreview", preview);
 
@@ -128,6 +141,8 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings> {
 
 	private endRound() {
 		clearTimeout(this.endRoundTimer);
+
+		this.currentPreview = undefined;
 
 		const music = this.musics[this.currentMusicIndex];
 

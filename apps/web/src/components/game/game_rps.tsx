@@ -71,6 +71,8 @@ export class RockPaperScissorsGame extends AbstractGame<RpsMessageTypings, RpsSt
 	}
 
 	protected handleData(event: EventObject<RpsMessageTypings>) {
+		super.handleData(event);
+
 		if (event.type === "playable") {
 			this.setState({
 				playable: event.data,

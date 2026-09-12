@@ -1,9 +1,10 @@
-import { AvailableGames, GameTypes, generateString, Setting, validateSetting } from "@repo/shared";
+import { AvailableGames, GamePlayer, GameTypes, generateString, Setting, validateSetting } from "@repo/shared";
 import { Room } from "../struct/room";
 import { WebSocketClient } from "../struct/websocket_client";
 import { RockPaperScissorsGame } from "../struct/game/rps_game";
 import { WikiRaceGame } from "../struct/game/wikirace_game";
 import { BlindtestGame } from "../struct/game/blindtest_game";
+import { GameStatus } from "@repo/shared/src/struct/game";
 
 function createGame(type: GameTypes, room: Room) {
 	switch (type) {
@@ -24,6 +25,8 @@ export default class RoomsService {
 	public static INSTANCE: RoomsService = new RoomsService();
 
 	private currentRooms = new Map<string, Room>();
+	private roomForPlayer = new Map<string, string>();
+	private disconnectionTimers = new Map<string, NodeJS.Timeout>();
 
 	public initialize() {
 	}
@@ -44,8 +47,8 @@ export default class RoomsService {
 		return room;
 	}
 
-	public registerPlayer(room: Room, wsClient: WebSocketClient, name: string, id: string) {
-		if (room.getPlayers().find(player => player.name === name)) {
+	public registerPlayer(room: Room, wsClient: WebSocketClient, name: string, id: string, isRejoin: boolean) {
+		if (!isRejoin && room.getPlayers().find(player => player.name === name)) {
 			wsClient.send("error", "Name already used");
 			wsClient.close(3000);
 			return;
@@ -53,17 +56,32 @@ export default class RoomsService {
 
 		const otherPlayers = room.getPlayers();
 
-		room.registerPlayer(name, wsClient, id, undefined);
+		if (!isRejoin) {
+			room.registerPlayer(name, wsClient, id, undefined);
+		} else {
+			const timeout = this.disconnectionTimers.get(id);
+
+			if (!timeout) {
+				return;
+			}
+
+			clearTimeout(timeout);
+			this.disconnectionTimers.delete(id);
+		}
+
+		this.roomForPlayer.set(wsClient.getId(), id);
 
 		wsClient.send("self", id);
 		wsClient.send("roomData", room);
+
+		const game = room.game;
 
 		wsClient.on("startGame", () => {
 			if (!this.isOwner(room, wsClient)) {
 				return;
 			}
 
-			const gameType = AvailableGames[room.game.type];
+			const gameType = AvailableGames[game.type];
 
 			if (gameType.minPlayers > room.players.size
 				|| room.players.size > gameType.maxPlayers) {
@@ -89,7 +107,7 @@ export default class RoomsService {
 				return;
 			}
 
-			const setting = room.game.settings[change.name];
+			const setting = game.settings[change.name];
 
 			if (!setting) {
 				wsClient.send("error", "Invalid setting");
@@ -100,14 +118,14 @@ export default class RoomsService {
 				return;
 			}
 
-			validateSetting(setting.type, change.value, change.name, room.game.settings).then(bool => {
+			validateSetting(setting.type, change.value, change.name, game.settings).then(bool => {
 				if (!bool) {
 					return;
 				}
 
 				setting.value = change.value;
 
-				room.game.handleSettingChange(change.name, change.value);
+				game.handleSettingChange(change.name, change.value);
 
 				room.broadcast("settingUpdated", change);
 			});
@@ -118,11 +136,11 @@ export default class RoomsService {
 				return;
 			}
 
-			const settings = room.game.settings;
+			const settings = game.settings;
 
-			createGame(room.game.type, room);
+			createGame(game.type, room);
 
-			room.game.settings = settings;
+			game.settings = settings;
 
 			room.broadcast("roomData", room);
 		});
@@ -142,6 +160,7 @@ export default class RoomsService {
 			}
 
 			room.players.delete(data);
+			this.roomForPlayer.delete(data);
 
 			const ws = player.ws!;
 			ws.close(4001); // Kick code
@@ -153,35 +172,74 @@ export default class RoomsService {
 		wsClient.on("gameEvent", (data) => room.handleGameEvent(wsClient, data));
 
 		wsClient.on("leaveGame", () => {
-			const clientId = wsClient.getId();
+			this.handleLeave(wsClient, room);
+		});
 
-			const player = room.players.get(clientId);
-			if (!player) {
+		wsClient.ws.addEventListener("close", data => {
+			if (data.code === 3000 || data.code >= 4000) {
 				return;
 			}
 
-			room.players.delete(clientId);
+			const clientId = wsClient.getId();
+			this.disconnectionTimers.set(clientId, setTimeout(() => this.handleLeave(wsClient, room), 30 * 1000));
 
-			wsClient.close(4002); // Left game
-
-			room.broadcast("playerLeft", clientId);
-
-			if (room.players.size === 0) {
-				this.currentRooms.delete(room.getId());
-			} else if (player.owner) {
-				const newOwner = room.getPlayers()[0];
-
-				newOwner.owner = true;
-
-				room.broadcast("newOwner", newOwner.id);
-			}
+			room.broadcast("playerDisconnected", clientId);
 		});
 
-		otherPlayers.forEach(player => player.ws?.send("playerJoined", room.getPlayers().pop()));
+		if (isRejoin) {
+			otherPlayers.forEach(player => player.ws?.send("playerRejoined", wsClient.getId()));
 
-		room.game.registerClient(wsClient);
+			room.players.get(wsClient.getId())!.ws = wsClient;
+
+			const state = game.getState(wsClient.getId());
+
+			let currentStatus: GameStatus = "lobby";
+			if (game.results) {
+				currentStatus = "results";
+			} else if (game.isGameStarted()) {
+				currentStatus = "playing";
+			}
+
+			setTimeout(() => {
+				wsClient.send("statusSync", currentStatus);
+				wsClient.send("gameEvent", {
+					type: "syncState",
+					data: state,
+				});
+			}, 100);
+		} else {
+			otherPlayers.forEach(player => player.ws?.send("playerJoined", room.getPlayers().pop()));
+
+			game.registerClient(wsClient);
+		}
 
 		console.log(`[${"INFO / Room".blue}] Player ${name} joined room ${room.id}`);
+	}
+
+	private handleLeave(wsClient: WebSocketClient, room: Room) {
+		const clientId = wsClient.getId();
+
+		const player = room.players.get(clientId);
+		if (!player) {
+			return;
+		}
+
+		room.players.delete(clientId);
+
+		wsClient.close(4002); // Left game
+
+		room.broadcast("playerLeft", clientId);
+		this.roomForPlayer.delete(clientId);
+
+		if (room.players.size === 0) {
+			this.currentRooms.delete(room.getId());
+		} else if (player.owner) {
+			const newOwner = room.getPlayers()[0];
+
+			newOwner.owner = true;
+
+			room.broadcast("newOwner", newOwner.id);
+		}
 	}
 
 	private isOwner(room: Room, wsClient: WebSocketClient) {
@@ -215,5 +273,21 @@ export default class RoomsService {
 		setTimeout(() => {
 			game.startGame();
 		}, 100);
+	}
+
+	public tryRejoin(playerId: string, id: string): [undefined, undefined] | [GamePlayer, Room] {
+		const room = this.currentRooms.get(id);
+
+		if (!room) {
+			return [undefined, undefined];
+		}
+
+		const player = room.players.get(playerId);
+
+		if (!player) {
+			return [undefined, undefined];
+		}
+
+		return [player, room];
 	}
 }
