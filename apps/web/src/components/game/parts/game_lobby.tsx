@@ -37,8 +37,11 @@ export function GameLobby() {
 	}
 
 	return <div className={"game-container gradient-reverse"}>
-		<div className={"flex gap-12 items-center"}>
-			<h1>Room code: {websocket.getRoom()?.id} </h1>
+		<div className={"flex items-center justify-between w-full"}>
+			<div className={"flex flex-col"}>
+				<span className={"uppercase text-gray-400"}>Room code</span>
+				<h1>{websocket.getRoom()?.id}</h1>
+			</div>
 			<div className={"flex gap-4 items-center"}>
 				<img src={copy}
 					onClick={() => {
