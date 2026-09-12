@@ -3,6 +3,7 @@ import RoomsService from "./rooms_service";
 import { Room } from "../struct/room";
 import { WebSocketClient } from "../struct/websocket_client";
 import { generateString } from "@repo/shared";
+import "colorts/lib/string";
 
 export default class CoreWebsocketService {
 
@@ -11,15 +12,14 @@ export default class CoreWebsocketService {
 	// TODO : Store WS clients
 
 	public initialize(): void {
-		console.log("Initializing CoreWebsocketService");
+		console.log(`[${"INFO / WS".blue}] Initializing websocket service`);
 
 		const PORT = parseInt(process.env.PORT ?? "") || 3334;
 		const wss = new WebSocketServer({ port: PORT }, () => {
-			console.log(`Ready`);
+			console.log(`[${"INFO / WS".blue}] Websocket service started`);
 		});
 
 		wss.on("connection", (ws, req) => {
-			console.log(`Websocket connection connected: ${ws}`);
 			const urlSearchParams = new URLSearchParams(req.url?.split("?").slice(1).join("?"));
 
 			const id = urlSearchParams.get("id");
@@ -63,7 +63,6 @@ export default class CoreWebsocketService {
 					ws.close(3000);
 					return;
 				}
-				console.log("Joining");
 			}
 
 			if (room === undefined) {
@@ -74,8 +73,6 @@ export default class CoreWebsocketService {
 				ws.close(3000);
 				return;
 			}
-
-			console.log("Success");
 
 			const clientId = generateString(10);
 			// eslint-disable-next-line
