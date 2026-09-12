@@ -1,20 +1,23 @@
 import { Component } from "react";
 
 interface TimerComponentProps {
-	startedAt: number;
-	finishedAt?: number;
+	startedAt: number,
+	finishedAt?: number,
+	couldNA?: boolean
 }
 
 export class TimerComponent extends Component<TimerComponentProps> {
 
 	private readonly startedAt: number;
 	private readonly finishedAt?: number;
+	private readonly couldNA?: boolean;
 
 	constructor(props: TimerComponentProps) {
 		super(props);
 
 		this.startedAt = props.startedAt;
 		this.finishedAt = props.finishedAt;
+		this.couldNA = props.couldNA;
 	}
 
 	public componentDidMount() {
@@ -30,6 +33,10 @@ export class TimerComponent extends Component<TimerComponentProps> {
 	}
 
 	public render() {
+		if (this.couldNA) {
+			return <span>N/A</span>;
+		}
+
 		let finishedAt = this.finishedAt;
 		if (finishedAt === undefined) {
 			finishedAt = Date.now();

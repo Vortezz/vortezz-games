@@ -5,9 +5,11 @@ interface WikiRaceMessageTypings extends CoreMessageTypings {
 	changedPage: { id: string, page: string };
 	gameFinished: { id: string, finishedAt: number };
 	currentPaths: { id: string, pages: string[] }[];
+	surrenderCount: number;
 
 	// Clientbound
 	changePage: string;
+	wantsToSurrender: void;
 }
 
 export type { WikiRaceMessageTypings };

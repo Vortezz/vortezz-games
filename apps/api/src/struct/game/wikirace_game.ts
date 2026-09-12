@@ -7,6 +7,7 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 
 	private pathsTaken: Map<string, string[]> = new Map();
 	private finishedAt: Map<string, number> = new Map();
+	private wantsToSurrender: Map<string, boolean> = new Map();
 
 	public constructor(room: Room) {
 		super(room, "wikirace");
@@ -91,8 +92,28 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 			}
 
 			if (this.finishedAt.size === this.getRoom().players.size) {
-				this.getRoom().broadcast("setResults", [...this.room.players.entries()].map(entry => {
-					const id = entry[0];
+				this.endGame();
+			}
+		} else if (data.type === "wantsToSurrender") {
+			this.wantsToSurrender.set(wsClient.getId(), true);
+
+			const wantsToSurrenderCount = this.wantsToSurrender.size;
+			this.broadcast("surrenderCount", wantsToSurrenderCount);
+
+			if (this.wantsToSurrender.size === this.getRoom().players.size) {
+				this.broadcast("currentPaths", [...this.pathsTaken.entries()].map((item) => ({
+					id: item[0],
+					pages: item[1],
+				})));
+
+				this.endGame();
+			}
+		}
+	}
+
+	public endGame() {
+		this.getRoom().broadcast("setResults", [...this.room.players.entries()].map(entry => {
+			const id = entry[0];
 
 					return {
 						id: id,
@@ -101,9 +122,7 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 					};
 				}).sort((a, b) => a.amount - b.amount));
 
-				this.getRoom().broadcast("gameEnded");
-			}
-		}
+		this.getRoom().broadcast("gameEnded");
 	}
 
 	public handleSettingChange(name: string, value: any) {

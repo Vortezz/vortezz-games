@@ -1,7 +1,8 @@
 import * as d3 from "d3";
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { GamePlayer, Settings } from "@repo/shared";
 import { TimerComponent } from "../parts/timer";
+import { WebsocketContext } from "../../../context/websocket_context";
 
 export function ResultWikiRace({ paths, startPage, endPage, players, finishedAt, startedAt, settings }: {
 	paths: { id: string, pages: string[] }[],
@@ -13,6 +14,11 @@ export function ResultWikiRace({ paths, startPage, endPage, players, finishedAt,
 	settings: Settings
 }) {
 	const ref = useRef<SVGSVGElement>(null);
+	const { websocket } = useContext(WebsocketContext);
+
+	if (!websocket) {
+		return <></>;
+	}
 
 	useEffect(() => {
 		const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
@@ -188,7 +194,8 @@ export function ResultWikiRace({ paths, startPage, endPage, players, finishedAt,
 					className={"border-b-white border-b border-0.5"}>
 					<td>{players.get(path.id)!.name}</td>
 					<td><TimerComponent startedAt={startedAt}
-						finishedAt={finishedAt.get(path.id)} /></td>
+						finishedAt={finishedAt.get(path.id)}
+						couldNA={!finishedAt.has(path.id) && websocket.getGameStatus() === "results"} /></td>
 					<td>{path.pages.length - 1}</td>
 					<td className={"py-2"}>{path.pages.join(" → ")}</td>
 				</tr>)}
