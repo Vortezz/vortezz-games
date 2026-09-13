@@ -24,9 +24,10 @@ export default class RoomsService {
 
 	public static INSTANCE: RoomsService = new RoomsService();
 
-	private currentRooms = new Map<string, Room>();
-	private roomForPlayer = new Map<string, string>();
-	private disconnectionTimers = new Map<string, NodeJS.Timeout>();
+	private currentRooms: Map<string, Room> = new Map<string, Room>();
+	private roomForPlayer: Map<string, string> = new Map<string, string>();
+	private disconnectionTimers: Map<string, NodeJS.Timeout> = new Map<string, NodeJS.Timeout>();
+	private lastMessage: Map<string, number> = new Map<string, number>();
 
 	public initialize() {
 	}
@@ -69,7 +70,9 @@ export default class RoomsService {
 			this.disconnectionTimers.delete(id);
 		}
 
-		this.roomForPlayer.set(wsClient.getId(), id);
+		const clientId = wsClient.getId();
+		this.roomForPlayer.set(clientId, id);
+		this.lastMessage.set(clientId, Date.now());
 
 		wsClient.send("self", id);
 		wsClient.send("roomData", room);
@@ -168,7 +171,16 @@ export default class RoomsService {
 			room.broadcast("playerKicked", data);
 		});
 
-		wsClient.on("ping", () => wsClient.send("pong"));
+		wsClient.on("ping", () => {
+			wsClient.send("pong");
+
+			const lastMessage = this.lastMessage.get(clientId) ?? Date.now();
+
+			if (Date.now() - lastMessage > 30 * 60 * 1000) {
+				wsClient.send("error", "You were kicked because of inactivity");
+				this.handleLeave(wsClient, room);
+			}
+		});
 		wsClient.on("gameEvent", (data) => room.handleGameEvent(wsClient, data));
 
 		wsClient.on("leaveGame", () => {
@@ -176,22 +188,31 @@ export default class RoomsService {
 		});
 
 		wsClient.ws.addEventListener("close", data => {
+			this.lastMessage.delete(clientId);
+
 			if (data.code === 3000 || data.code >= 4000) {
+				this.roomForPlayer.delete(clientId);
+				this.disconnectionTimers.delete(clientId);
 				return;
 			}
 
-			const clientId = wsClient.getId();
 			this.disconnectionTimers.set(clientId, setTimeout(() => this.handleLeave(wsClient, room), 30 * 1000));
 
 			room.broadcast("playerDisconnected", clientId);
 		});
 
+		wsClient.ws.addEventListener("message", data => {
+			if (!data.data.toString().includes("\"type\":\"ping\"")) {
+				this.lastMessage.set(clientId, Date.now());
+			}
+		});
+
 		if (isRejoin) {
-			otherPlayers.forEach(player => player.ws?.send("playerRejoined", wsClient.getId()));
+			otherPlayers.forEach(player => player.ws?.send("playerRejoined", clientId));
 
-			room.players.get(wsClient.getId())!.ws = wsClient;
+			room.players.get(clientId)!.ws = wsClient;
 
-			const state = game.getState(wsClient.getId());
+			const state = game.getState(clientId);
 
 			let currentStatus: GameStatus = "lobby";
 			if (game.results) {
@@ -233,6 +254,8 @@ export default class RoomsService {
 
 		room.broadcast("playerLeft", clientId);
 		this.roomForPlayer.delete(clientId);
+		this.lastMessage.delete(clientId);
+		this.disconnectionTimers.delete(clientId);
 
 		if (room.players.size === 0) {
 			this.currentRooms.delete(room.getId());
