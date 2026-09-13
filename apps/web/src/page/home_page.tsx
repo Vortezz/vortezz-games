@@ -72,7 +72,7 @@ function CodeInput({ id, code, setCode }: { id: number, code: string, setCode: (
 				nextInput.focus();
 			}
 		}}
-		className={"h-20 w-20 text-center text-white text-3xl rounded-xl border border-[#676767] bg-[#32006F]"}></input>;
+		className={"h-12 w-12 sm:h-20 sm:w-20 text-center text-white text-3xl rounded-xl border border-[#676767] bg-[#32006F]"}></input>;
 }
 
 export default function HomePage() {
@@ -80,11 +80,11 @@ export default function HomePage() {
 	const navigate = useNavigate();
 
 	return <LayoutPage>
-		<div className={"text-6xl font-semibold text-white ml-12 gap-4 flex flex-col"}>
+		<div className={"text-6xl font-semibold text-white mx-auto sm:ml-12 gap-4 text-center sm:text-left flex flex-col"}>
 			<h1><span className={"font-black"}>Play</span> with your <span className={"font-black"}>friends</span>,</h1>
 			<h1><span className={"font-black"}>online</span> and for <span className={"font-black"}>free</span>!</h1>
 		</div>
-		<div className={"w-116 ml-12 mb-8"}>
+		<div className={"w-70 sm:w-116 mx-auto sm:ml-12 mb-8"}>
 			<Link className={"bg-lime-300 rounded-xl h-20 w-full flex items-center justify-center"}
 				to={"/create"}>CREATE A GAME
 			</Link>
@@ -94,12 +94,12 @@ export default function HomePage() {
 				<hr className={"w-full ml-4"} />
 			</div>
 			<div className={"text-[#676767] text-xs mb-2"}>Having a code? Join your friend’s game.</div>
-			<div className={"flex gap-4"}>
+			<div className={"flex sm:gap-4 gap-2 mx-auto"}>
 				{[0, 1, 2, 3].map((id) => <CodeInput id={id}
 					code={code}
 					setCode={setCode}
 					key={id} />)}
-				<button className={"h-20 w-20 rounded-xl border bg-[#FF4882] cursor-pointer disabled:cursor-not-allowed disabled:opacity-20"}
+				<button className={"h-12 w-12 sm:h-20 sm:w-20 rounded-xl border bg-[#FF4882] cursor-pointer disabled:cursor-not-allowed disabled:opacity-20"}
 					disabled={code.includes(" ")}
 					onClick={() => {
 						navigate(`/join?id=${code}`);

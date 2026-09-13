@@ -63,7 +63,7 @@ export function GameLobby() {
 			</div>
 		</div>
 		<hr className={"text-[#676767]"} />
-		<div className={"flex mx-auto w-240 gap-8"}>
+		<div className={"flex mx-auto w-240 max-w-full gap-6 flex-wrap"}>
 			<div className={"w-108"}>
 				<div className={"flex items-center gap-2"}>
 					<h3>Players</h3>

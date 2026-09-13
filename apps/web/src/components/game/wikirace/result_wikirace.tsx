@@ -172,35 +172,37 @@ export function ResultWikiRace({ paths, startPage, endPage, players, finishedAt,
 	}, [paths]);
 
 	return <>
-		<table className={"text-white w-full text-left"}>
-			<thead className={"border-b-white border-b"}>
-			<tr>
-				<th className={"w-48"}>Name</th>
-				<th className={"w-28"}>Timer</th>
-				<th className={"w-20"}>Clics</th>
-				<th className={"w-[calc(100%-24rem)]"}>Pages visited</th>
-			</tr>
-			</thead>
-			<tbody>
-			{paths
-				.sort((a, b) => {
-					if (settings.ranking.value === "fastest") {
-						return (finishedAt.get(a.id) ?? 1e20) - (finishedAt.get(b.id) ?? 1e20);
-					} else {
-						return a.pages.length - b.pages.length;
-					}
-				})
-				.map((path) => <tr key={path.id}
-					className={"border-b-white border-b border-0.5"}>
-					<td>{players.get(path.id)!.name}</td>
-					<td><TimerComponent startedAt={startedAt}
-						finishedAt={finishedAt.get(path.id)}
-						couldNA={!finishedAt.has(path.id) && websocket.getGameStatus() === "results"} /></td>
-					<td>{path.pages.length - 1}</td>
-					<td className={"py-2"}>{path.pages.join(" → ")}</td>
-				</tr>)}
-			</tbody>
-		</table>
+		<div className={"overflow-x-auto w-full block min-w-0"}>
+			<table className={"text-white text-left table-fixed w-full min-w-160"}>
+				<thead className={"border-b-white border-b"}>
+				<tr>
+					<th className={"w-1/6"}>Name</th>
+					<th className={"w-1/6"}>Timer</th>
+					<th className={"w-1/6"}>Clics</th>
+					<th className={"w-1/2"}>Pages visited</th>
+				</tr>
+				</thead>
+				<tbody className={"overflow-auto"}>
+				{paths
+					.sort((a, b) => {
+						if (settings.ranking.value === "fastest") {
+							return (finishedAt.get(a.id) ?? 1e20) - (finishedAt.get(b.id) ?? 1e20);
+						} else {
+							return a.pages.length - b.pages.length;
+						}
+					})
+					.map((path) => <tr key={path.id}
+						className={"border-b-white border-b border-0.5"}>
+						<td>{players.get(path.id)!.name}</td>
+						<td><TimerComponent startedAt={startedAt}
+							finishedAt={finishedAt.get(path.id)}
+							couldNA={!finishedAt.has(path.id) && websocket.getGameStatus() === "results"} /></td>
+						<td>{path.pages.length - 1}</td>
+						<td className={"py-2 break-words"}>{path.pages.join(" → ")}</td>
+					</tr>)}
+				</tbody>
+			</table>
+		</div>
 		<h3 className={"mt-8"}>Pages graph</h3>
 		<svg
 			ref={ref}>
