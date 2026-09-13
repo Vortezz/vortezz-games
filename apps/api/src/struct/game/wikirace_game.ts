@@ -7,7 +7,6 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 
 	private pathsTaken: Map<string, string[]> = new Map();
 	private finishedAt: Map<string, number> = new Map();
-	private startedAt: number = 0;
 
 	public constructor(room: Room) {
 		super(room, "wikirace");
@@ -25,6 +24,25 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 
 	public registerClient(ws: WebSocketClient) {
 		this.pathsTaken.set(ws.getId(), []);
+	}
+
+	public getState(id: string): any {
+		const path = this.pathsTaken.get(id);
+
+		let currentPage = this.settings.startPage.value;
+		if (path) {
+			currentPage = path[path.length - 1];
+		}
+
+		return {
+			currentPage: currentPage,
+			finished: this.finishedAt.has(id),
+			finishedAt: this.finishedAt,
+			paths: [...this.pathsTaken.entries()].map((item) => ({
+				id: item[0],
+				pages: item[1],
+			})),
+		};
 	}
 
 	public handleGameEvent(wsClient: WebSocketClient, data: { type: string, data: any }) {
@@ -78,7 +96,7 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 
 					return {
 						id: id,
-						amount: this.finishedAt.has(id) ? this.finishedAt.get(id)! - this.startedAt : -1,
+						amount: this.finishedAt.has(id) ? this.finishedAt.get(id)! - (this.startedAt ?? 0) : -1,
 						format: "duration" as "duration",
 					};
 				}).sort((a, b) => a.amount - b.amount));

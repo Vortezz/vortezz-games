@@ -14,6 +14,8 @@ export interface Events {
 
 export type SettingType = "number" | "wikilanguage" | "wikipage" | "boolean" | "choice";
 
+export type GameStatus = "lobby" | "playing" | "results";
+
 export type Setting = {
 	name: string;
 	type: SettingType;

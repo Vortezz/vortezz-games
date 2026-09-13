@@ -1,12 +1,16 @@
-import { GamePlayer, GameTypes } from "../struct/game";
+import { GamePlayer, GameStatus, GameTypes } from "../struct/game";
 import { RoomTypings } from "../struct/room";
 
 interface CoreMessageTypings {
 	// Serverbound
 	pong: void;
 	roomData: RoomTypings;
-	playerJoined: GamePlayer,
-	playerLeft: GamePlayer,
+	playerJoined: GamePlayer, // When a player joins the game
+	playerRejoined: string, // When a player rejoins the game after a disconnection
+	playerDisconnected: string, // When a player is disconnected from the game
+	playerLeft: string, // When a player clicks on the 'Leave game' button
+	playerKicked: string // When a player is kicked from the game
+	newOwner: string;
 	gameStarted: void;
 	gameEnded: void;
 	settingUpdated: {
@@ -19,6 +23,10 @@ interface CoreMessageTypings {
 		format: "points" | "duration";
 	}[];
 	self: string;
+	statusSync: {
+		status: GameStatus;
+		startedAt: number | undefined;
+	};
 	error: string;
 	needsPassword: string;
 
@@ -32,6 +40,8 @@ interface CoreMessageTypings {
 		value: any;
 	};
 	resetGame: void;
+	kickPlayer: string;
+	leaveGame: void;
 
 	// Both
 	gameEvent: {
@@ -39,6 +49,7 @@ interface CoreMessageTypings {
 		// eslint-disable-next-line
 		data: any;
 	};
+	stateSync: any;
 }
 
 type CoreMessageType = keyof CoreMessageTypings;

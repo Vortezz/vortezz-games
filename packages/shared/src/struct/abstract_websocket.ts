@@ -4,7 +4,7 @@ type Handler<K extends keyof E, E extends CoreMessageTypings> = (data: E[K]) => 
 
 export class AbstractWebSocket {
 
-	protected readonly ws: WebSocket;
+	public readonly ws: WebSocket;
 	protected roomId: string | undefined;
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,6 +51,15 @@ export class AbstractWebSocket {
 		}, function (key, value) {
 			if (key === "ws" || key === "room" || key === "handlers" || key === "password") {
 				return undefined;
+			}
+
+			if (key === "game") {
+				return {
+					type: value.type,
+					room: undefined,
+					settings: value.settings,
+					results: value.results,
+				};
 			}
 
 			if (value instanceof Map) {

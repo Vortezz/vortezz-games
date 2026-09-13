@@ -10,6 +10,7 @@ export abstract class AbstractGame<E extends CoreMessageTypings> implements Game
 	settings: any;
 	readonly room: Room;
 	results = undefined;
+	public startedAt: number | undefined;
 
 	private isStarted = false;
 
@@ -22,6 +23,8 @@ export abstract class AbstractGame<E extends CoreMessageTypings> implements Game
 	public startGame() {
 		this.isStarted = true;
 
+		this.startedAt = Date.now();
+
 		// to be overridden
 	}
 
@@ -32,6 +35,8 @@ export abstract class AbstractGame<E extends CoreMessageTypings> implements Game
 	public registerClient(ws: WebSocketClient) {
 		// to be overridden
 	}
+
+	public abstract getState(id: string): any;
 
 	public getType() {
 		return this.type;
@@ -59,13 +64,6 @@ export abstract class AbstractGame<E extends CoreMessageTypings> implements Game
 
 	public handleSettingChange(name: string, value: any) {
 		// to be overridden
-	}
-}
-
-export class DefaultGame extends AbstractGame<CoreMessageTypings> {
-
-	public constructor(room: Room) {
-		super(room, "default");
 	}
 }
 

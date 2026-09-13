@@ -105,7 +105,12 @@ export abstract class AbstractGame<MessageTypings extends CoreMessageTypings, IS
 		// to override
 	}
 
-	protected abstract handleData(event: EventObject<MessageTypings>): void;
+	protected handleData(event: EventObject<MessageTypings>): void {
+		if (event.type === "syncState") {
+			// @ts-ignore
+			this.setState(event.data);
+		}
+	}
 
 	protected abstract getDefaultState(): IState;
 }

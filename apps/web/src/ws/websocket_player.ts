@@ -1,4 +1,4 @@
-import { AbstractWebSocket, RoomTypings } from "@repo/shared";
+import { AbstractWebSocket, GameStatus, RoomTypings } from "@repo/shared";
 import { router } from "../router";
 import { NotificationType } from "../context/notification_context";
 
@@ -7,7 +7,7 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 	private readonly forceUpdate: () => void;
 	private readonly showNotification: (type: NotificationType, message: string) => void;
 	private room: RoomTypings | undefined;
-	private gameStatus: "lobby" | "playing" | "results" = "lobby";
+	private gameStatus: GameStatus = "lobby";
 	private gameStartedAt: number = 0;
 	private playerId: string | undefined;
 	private settingsVersion: number = 0;
@@ -17,12 +17,27 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 		data: any;
 	}) => void) | undefined;
 
-	// TODO : Load self
-
 	constructor(ws: WebSocket, forceUpdate: () => void, showNotification: (type: NotificationType, message: string) => void) {
 		super(ws);
 
 		ws.addEventListener("close", (e) => {
+			if (e.code === 4001) { // Kick
+				router.navigate("/");
+				showNotification("warning", "You were kicked from the game");
+				return;
+			}
+
+			if (e.code === 4002) { // Leave
+				router.navigate("/");
+				showNotification("success", "You left the game");
+				return;
+			}
+
+			if (e.code === 4003) { // Failed to rejoin
+				localStorage.removeItem("lastGame");
+				return;
+			}
+
 			if (e.code !== 3000) {
 				showNotification("error", "Unexpected error occurred");
 				router.navigate("/");
@@ -49,6 +64,12 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 		this.on("roomData", (data) => {
 			this.room = data;
 
+			localStorage.setItem("lastGame", JSON.stringify({
+				playerId: this.playerId,
+				roomId: this.room.id,
+				timestamp: Date.now(),
+			}));
+
 			if (window.location.pathname !== "/game") {
 				router.navigate("/game");
 			} else {
@@ -71,12 +92,61 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 			this.showNotification("enter", `${data.name} joined`);
 		});
 
+		this.on("playerDisconnected", (data) => {
+			const player = this.room?.players.get(data);
+			if (!player) {
+				return;
+			}
+
+			this.showNotification("warning", `${player.name} has disconnected, they have 30 seconds to reconnect`);
+		});
+
+		this.on("playerRejoined", (data) => {
+			const player = this.room?.players.get(data);
+			if (!player) {
+				return;
+			}
+
+			this.showNotification("enter", `${player.name} has rejoined`);
+		});
+
 		this.on("playerLeft", (data) => {
-			this.room?.players.delete(data.id);
+			const player = this.room?.players.get(data);
+			if (!player) {
+				return;
+			}
+
+			this.room?.players.delete(data);
 
 			this.forceUpdate();
 
-			this.showNotification("exit", `${data.name} left`);
+			this.showNotification("exit", `${player.name} has left`);
+		});
+
+		this.on("playerKicked", (data) => {
+			const player = this.room?.players.get(data);
+			if (!player) {
+				return;
+			}
+
+			this.room?.players.delete(data);
+
+			this.forceUpdate();
+
+			this.showNotification("exit", `${player.name} was kicked`);
+		});
+
+		this.on("newOwner", (data) => {
+			const player = this.room?.players.get(data);
+			if (!player) {
+				return;
+			}
+
+			player.owner = true;
+
+			this.forceUpdate();
+
+			this.showNotification("info", `${player.name} is the new owner`);
 		});
 
 		this.on("gameStarted", () => {
@@ -118,6 +188,19 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 
 			router.navigate(`/join${data}`);
 		});
+
+		this.on("statusSync", (data) => {
+			this.gameStartedAt = data.startedAt ?? 0;
+			this.setGameStatus(data.status);
+		});
+
+		this.on("pong", () => {
+			localStorage.setItem("lastGame", JSON.stringify({
+				playerId: this.playerId,
+				roomId: this.room!.id,
+				timestamp: Date.now(),
+			}));
+		});
 	}
 
 	public isConnected() {
@@ -148,6 +231,10 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 
 	public getSettingsVersion() {
 		return this.settingsVersion;
+	}
+
+	public getPlayerId() {
+		return this.playerId;
 	}
 
 	public setGameEventHandler(handler: ((data: {

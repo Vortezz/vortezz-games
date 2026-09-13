@@ -9,7 +9,7 @@ export default class CoreWebsocketService {
 
 	public static INSTANCE: CoreWebsocketService = new CoreWebsocketService();
 
-	// TODO : Store WS clients
+	public readonly clients: Map<string, WebSocketClient> = new Map<string, WebSocketClient>();
 
 	public initialize(): void {
 		console.log(`[${"INFO / WS".blue}] Initializing websocket service`);
@@ -23,13 +23,15 @@ export default class CoreWebsocketService {
 			const urlSearchParams = new URLSearchParams(req.url?.split("?").slice(1).join("?"));
 
 			const id = urlSearchParams.get("id");
-			const name = urlSearchParams.get("name");
+			const playerId = urlSearchParams.get("playerId");
+			let name = urlSearchParams.get("name");
 			const roomName = urlSearchParams.get("roomName");
 			const password = urlSearchParams.get("password");
 			const action = urlSearchParams.get("action");
 
-			if (name === null || name === ""
-				|| action === null || action === ""
+			if (action === null || action === ""
+				|| ((playerId === null || playerId === "") && action === "rejoin")
+				|| ((name === null || name === "") && action !== "rejoin")
 				|| ((id === null || id === "") && action !== "create")
 				|| ((roomName === null || roomName === "") && action === "create")) {
 				ws.send(JSON.stringify({
@@ -41,9 +43,10 @@ export default class CoreWebsocketService {
 			}
 
 			let room: Room | undefined;
+			let clientId = generateString(10);
 			if (action === "create") {
 				room = RoomsService.INSTANCE.createRoom(roomName ?? "", password);
-			} else {
+			} else if (action === "join") {
 				room = RoomsService.INSTANCE.getRoom(id ?? "");
 
 				if (room && room.password && !password) {
@@ -63,6 +66,18 @@ export default class CoreWebsocketService {
 					ws.close(3000);
 					return;
 				}
+			} else if (action === "rejoin") {
+				clientId = playerId ?? clientId;
+
+				const [recoveredPlayer, recoveredRoom] = RoomsService.INSTANCE.tryRejoin(clientId, id ?? "");
+
+				if (!recoveredPlayer) {
+					ws.close(4003); // Rejoin not possible
+					return;
+				}
+
+				name = recoveredPlayer.name;
+				room = recoveredRoom;
 			}
 
 			if (room === undefined) {
@@ -74,16 +89,19 @@ export default class CoreWebsocketService {
 				return;
 			}
 
-			const clientId = generateString(10);
 			// eslint-disable-next-line
 			// @ts-ignore
 			const wsClient = new WebSocketClient(ws, clientId);
 			wsClient.setRoomId(room.id);
 
-			// TODO : Store WS
+			this.clients.set(wsClient.getId(), wsClient);
+
+			ws.on("close", () => {
+				this.clients.delete(wsClient.getId());
+			});
 
 			setTimeout(() => {
-				RoomsService.INSTANCE.registerPlayer(room, wsClient, name, clientId);
+				RoomsService.INSTANCE.registerPlayer(room, wsClient, name ?? "", clientId, action === "rejoin");
 			}, 100);
 		});
 	}
