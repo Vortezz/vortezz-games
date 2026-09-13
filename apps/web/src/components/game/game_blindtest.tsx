@@ -37,7 +37,7 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 		if (this.state.currentMusic !== undefined) {
 			return <div className={"game-container gradient-reverse"}>
 				<h2>You got {this.state.currentMusic.points} point{this.state.currentMusic.points > 1 ? "s" : ""}!</h2>
-				<div className={"flex align-center gap-8 mt-8"}>
+				<div className={"flex items-center justify-center gap-8 mt-8 overflow-x-auto flex-wrap"}>
 					<img className={"h-32 w-32 rounded-md"}
 						src={this.state.currentMusic.picture}
 						alt={"Album cover"} />
@@ -78,7 +78,7 @@ export class BlindtestGame extends AbstractGame<BlindtestMessageTypings, Blindte
 				<audio src={this.state.musicPreview}
 					id={"player"}
 					autoPlay={true} />
-				<div className={"flex items-center gap-4 mt-8"}>
+				<div className={"flex items-center justify-center gap-4 mt-8 flex-wrap"}>
 					<button disabled={this.state.hasSkipped}
 						className={"bg-lime-300 rounded-md py-2 px-4 mx-auto cursor-pointer disabled:bg-[#999999] disabled:cursor-default"}
 						onClick={() => {

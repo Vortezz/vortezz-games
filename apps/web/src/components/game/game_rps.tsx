@@ -25,7 +25,7 @@ export class RockPaperScissorsGame extends AbstractGame<RpsMessageTypings, RpsSt
 		if (this.state.playable) {
 			return <div className={"game-container gradient-reverse"}>
 				<h2>Pick your object:</h2>
-				<div className={"flex gap-16 mt-4"}>
+				<div className={"flex gap-16 mt-4 flex-wrap items-center justify-center"}>
 					<div className={"text-7xl cursor-pointer hover:text-8xl transition-all"}
 						onClick={() => this.pick("rock")}>🪨<span className={"text-8xl"}> </span> {/* TODO : Send pick */}
 					</div>
@@ -44,12 +44,12 @@ export class RockPaperScissorsGame extends AbstractGame<RpsMessageTypings, RpsSt
 
 			return <div className={"game-container gradient-reverse"}>
 				{this.state.result.winner ? <h3>{this.websocket.getRoom()?.players.get(this.state.result.winner)?.name} wins the round</h3> : <h3>Draw!</h3>}
-				<div className={"flex gap-32 mt-4"}>
-					<div className={"flex flex-col items-center"}>
+				<div className={"flex gap-32 mt-4 flex-wrap items-center justify-center"}>
+					<div className={"flex flex-col gap-4 items-center"}>
 						<div className={"text-7xl"}>{POSSIBILITY_TO_EMOJI[this.state.result.picks.get(players[0].id) ?? "paper"]}</div>
 						<p>{players[0].name}</p>
 					</div>
-					<div className={"flex flex-col items-center"}>
+					<div className={"flex flex-col gap-4 items-center"}>
 						<div className={"text-7xl"}>{POSSIBILITY_TO_EMOJI[this.state.result.picks.get(players[1].id) ?? "paper"]}</div>
 						<p>{players[1].name}</p>
 					</div>
