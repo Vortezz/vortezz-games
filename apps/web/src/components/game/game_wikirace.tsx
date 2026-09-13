@@ -16,6 +16,8 @@ interface WikiRaceTypings {
 		name: string;
 		element: HTMLAnchorElement;
 	} | undefined;
+	surrendersCount: number;
+	hasSurrendered: boolean;
 }
 
 function getAnchor(e: MouseEvent, allowPrevent?: boolean) {
@@ -105,7 +107,20 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 		}
 
 		return <div className={"game-container bg-white"}>
-			<h3 className={"text-black flex"}>Get to {this.getGame().settings.endPage.value} -&nbsp;<TimerComponent startedAt={this.websocket.getGameStartedAt()} /></h3>
+			<div className={"flex gap-8 items-center"}>
+				<h3 className={"text-black flex"}>
+					Get to {this.getGame().settings.endPage.value} -&nbsp;<TimerComponent startedAt={this.websocket.getGameStartedAt()} /></h3>
+				<button className={"bg-lime-300 rounded-md py-2 px-4 mx-auto cursor-pointer disabled:bg-[#999999] disabled:cursor-default"}
+					disabled={this.state.hasSurrendered}
+					onClick={() => {
+						this.sendGame("wantsToSurrender");
+
+						this.setState({
+							hasSurrendered: true,
+						});
+					}}>SURRENDER ({this.state.surrendersCount}/{this.getRoom().players.size})
+				</button>
+			</div>
 			<div className={`wiki-wrapper lang-${this.getGame().settings.language.value}`}>
 				{this.state.currentlyHovering && createPortal(<WikipediaOverview
 					content={this.savedOverviews.get(this.state.currentlyHovering.name)} />, this.state.currentlyHovering.element)}
@@ -196,7 +211,7 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 	}
 
 	private changePage(title: string, skipWs?: boolean) {
-		if (title === "" || title.startsWith("File:")) {
+		if (title === "" || title.startsWith("File:") || title.includes("redlink=1")) {
 			return;
 		}
 
@@ -241,6 +256,10 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 
 				return { finishedAt: new Map(oldState.finishedAt) };
 			});
+		} else if (event.type === "surrenderCount") {
+			this.setState({
+				surrendersCount: event.data,
+			});
 		}
 	}
 
@@ -256,6 +275,8 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 			finishedAt: new Map(),
 			paths: [],
 			currentlyHovering: undefined,
+			hasSurrendered: false,
+			surrendersCount: 0,
 		};
 	}
 }

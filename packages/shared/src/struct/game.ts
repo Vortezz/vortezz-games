@@ -14,6 +14,69 @@ export interface Events {
 
 export type SettingType = "number" | "wikilanguage" | "wikipage" | "boolean" | "choice";
 
+export const WIKI_LANGUAGES = [
+	{
+		id: "ar",
+		name: "Arabic",
+	},
+	{
+		id: "zh",
+		name: "Chinese",
+	},
+	{
+		id: "nl",
+		name: "Dutch",
+	},
+	{
+		id: "en",
+		name: "English",
+	},
+	{
+		id: "fr",
+		name: "French",
+	},
+	{
+		id: "de",
+		name: "German",
+	},
+	{
+		id: "it",
+		name: "Italian",
+	},
+	{
+		id: "ja",
+		name: "Japanese",
+	},
+	{
+		id: "pl",
+		name: "Polish",
+	},
+	{
+		id: "pt",
+		name: "Portuguese",
+	},
+	{
+		id: "ru",
+		name: "Russian",
+	},
+	{
+		id: "es",
+		name: "Spanish",
+	},
+	{
+		id: "sv",
+		name: "Swedish",
+	},
+	{
+		id: "uk",
+		name: "Ukrainian",
+	},
+	{
+		id: "vi",
+		name: "Vietnamese",
+	},
+];
+
 export type GameStatus = "lobby" | "playing" | "results";
 
 export type Setting = {
@@ -121,7 +184,7 @@ export async function validateSetting(type: SettingType, value: any, name: strin
 	} else if (type === "boolean") {
 		return typeof value === "boolean";
 	} else if (type === "wikilanguage") {
-		return ["fr", "en"].indexOf(value) !== -1;
+		return WIKI_LANGUAGES.filter(language => language.id === value).length > 0;
 	} else if (type === "wikipage") {
 		if (!otherSettings.language || value === "") {
 			return false;

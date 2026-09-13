@@ -1,3 +1,5 @@
+import { WIKI_LANGUAGES } from "@repo/shared/src/struct/game";
+
 export function WikipediaLanguageInput({ value, setValue, disabled }: { value: string, setValue: (value: string) => void, disabled: boolean }) {
 	return <select className={"relative w-full"}
 		value={value}
@@ -11,7 +13,7 @@ export function WikipediaLanguageInput({ value, setValue, disabled }: { value: s
 
 			setValue(target.value);
 		}}>
-		<option value={"en"}>English</option>
-		<option value={"fr"}>French</option>
+		{WIKI_LANGUAGES.map((lang) => <option key={lang.id}
+			value={lang.id}>{lang.name}</option>)}
 	</select>;
 }
