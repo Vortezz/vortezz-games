@@ -1,4 +1,4 @@
-import CoreWebsocketService from "./service/core_webstocket_service";
+import CoreWebsocketService from "./service/core_websocket_service";
 
 import RoomsService from "./service/rooms_service";
 
