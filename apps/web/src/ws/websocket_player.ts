@@ -189,7 +189,10 @@ export default class WebsocketPlayer extends AbstractWebSocket {
 			router.navigate(`/join${data}`);
 		});
 
-		this.on("statusSync", (status) => this.setGameStatus(status));
+		this.on("statusSync", (data) => {
+			this.gameStartedAt = data.startedAt ?? 0;
+			this.setGameStatus(data.status);
+		});
 
 		this.on("pong", () => {
 			localStorage.setItem("lastGame", JSON.stringify({

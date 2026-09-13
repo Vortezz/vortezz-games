@@ -8,6 +8,7 @@ export function WebsocketProvider({ children }: { children: ReactNode }) {
 	const [ws, setWS] = useState<undefined | WebsocketPlayer>();
 	const [, forceUpdate] = useReducer(x => x + 1, 0);
 	const [askForRejoin, setAskForRejoin] = useState(false);
+	const [rejoining, setRejoining] = useState(false);
 
 	const { showNotification } = useContext(NotificationContext);
 
@@ -53,6 +54,14 @@ export function WebsocketProvider({ children }: { children: ReactNode }) {
 
 		const wsPlayer = new WebsocketPlayer(ws, forceUpdate, showNotification);
 
+		ws.onmessage = () => {
+			setRejoining(false);
+		};
+
+		ws.onclose = () => {
+			setRejoining(false);
+		};
+
 		setWS(wsPlayer);
 	}
 
@@ -75,11 +84,15 @@ export function WebsocketProvider({ children }: { children: ReactNode }) {
 							onClick={() => {
 								const lastGame = JSON.parse(localStorage.getItem("lastGame") ?? "{}");
 
-								setAskForRejoin(false);
-
 								if (!lastGame.playerId || !lastGame.roomId || !lastGame.timestamp) {
+									setAskForRejoin(false);
+
 									return;
 								}
+
+								setRejoining(true);
+
+								setAskForRejoin(false);
 
 								createWebsocket({
 									id: lastGame.roomId,
@@ -95,6 +108,13 @@ export function WebsocketProvider({ children }: { children: ReactNode }) {
 							}}>No
 						</button>
 					</div>
+				</div>
+			</div>
+		}
+		{rejoining &&
+			<div className={"fixed flex h-screen w-full bg-black/70 cursor-pointer"}>
+				<div className={"m-auto bg-[#0E0023] flex flex-col gap-8 p-8 border border-gray-800 rounded-xl cursor-default"}>
+					<p>Rejoining...</p>
 				</div>
 			</div>
 		}

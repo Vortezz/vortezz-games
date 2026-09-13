@@ -76,6 +76,20 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 		};
 	}
 
+	public componentDidUpdate(_props: any, prevState: Readonly<WikiRaceTypings>) {
+		if (prevState.currentPage === this.state.currentPage) {
+			return;
+		}
+
+		fetch(`https://${this.getGame().settings.language.value}.wikipedia.org/w/api.php?action=parse&prop=text&page=${this.state.currentPage}&format=json&redirects=true&useskin=minerva&origin=*`)
+			.then(res => res.json())
+			.then(json => {
+				this.setState({
+					currentPageContent: json.parse.text["*"],
+				});
+			});
+	}
+
 	public renderPlaying(): JSX.Element {
 		if (this.state.finished) {
 			return <div className={"game-container gradient-reverse"}>
@@ -141,11 +155,11 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 						this.setState({
 							currentlyHovering: {
 								name: title,
-								element: element
+								element: element,
 							},
 						});
 
-						element.style.position="relative";
+						element.style.position = "relative";
 
 						fetch(`https://${this.getGame().settings.language.value}.wikipedia.org/api/rest_v1/page/summary/${title}`)
 							.then(res => res.json())
@@ -202,14 +216,6 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 			});
 			return;
 		}
-
-		fetch(`https://${this.getGame().settings.language.value}.wikipedia.org/w/api.php?action=parse&prop=text&page=${title}&format=json&redirects=true&useskin=minerva&origin=*`)
-			.then(res => res.json())
-			.then(json => {
-				this.setState({
-					currentPageContent: json.parse.text["*"],
-				});
-			});
 	}
 
 	protected handleData(event: EventObject<WikiRaceMessageTypings>) {

@@ -201,7 +201,10 @@ export default class RoomsService {
 			}
 
 			setTimeout(() => {
-				wsClient.send("statusSync", currentStatus);
+				wsClient.send("statusSync", {
+					status: currentStatus,
+					startedAt: game.startedAt,
+				});
 				wsClient.send("gameEvent", {
 					type: "syncState",
 					data: state,

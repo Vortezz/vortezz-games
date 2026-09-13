@@ -23,7 +23,10 @@ interface CoreMessageTypings {
 		format: "points" | "duration";
 	}[];
 	self: string;
-	statusSync: GameStatus;
+	statusSync: {
+		status: GameStatus;
+		startedAt: number | undefined;
+	};
 	error: string;
 	needsPassword: string;
 

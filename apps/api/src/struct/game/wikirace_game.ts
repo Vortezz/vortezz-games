@@ -7,7 +7,6 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 
 	private pathsTaken: Map<string, string[]> = new Map();
 	private finishedAt: Map<string, number> = new Map();
-	private startedAt: number = 0;
 
 	public constructor(room: Room) {
 		super(room, "wikirace");
@@ -97,7 +96,7 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 
 					return {
 						id: id,
-						amount: this.finishedAt.has(id) ? this.finishedAt.get(id)! - this.startedAt : -1,
+						amount: this.finishedAt.has(id) ? this.finishedAt.get(id)! - (this.startedAt ?? 0) : -1,
 						format: "duration" as "duration",
 					};
 				}).sort((a, b) => a.amount - b.amount));
