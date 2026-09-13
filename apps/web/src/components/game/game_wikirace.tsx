@@ -211,7 +211,7 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings, WikiRaceT
 	}
 
 	private changePage(title: string, skipWs?: boolean) {
-		if (title === "" || title.startsWith("File:")) {
+		if (title === "" || title.startsWith("File:") || title.includes("redlink=1")) {
 			return;
 		}
 

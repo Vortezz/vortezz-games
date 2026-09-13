@@ -115,12 +115,12 @@ export class WikiRaceGame extends AbstractGame<WikiRaceMessageTypings> {
 		this.getRoom().broadcast("setResults", [...this.room.players.entries()].map(entry => {
 			const id = entry[0];
 
-					return {
-						id: id,
-						amount: this.finishedAt.has(id) ? this.finishedAt.get(id)! - (this.startedAt ?? 0) : -1,
-						format: "duration" as "duration",
-					};
-				}).sort((a, b) => a.amount - b.amount));
+			return {
+				id: id,
+				amount: this.finishedAt.has(id) ? this.finishedAt.get(id)! - (this.startedAt ?? 0) : -1,
+				format: "duration" as "duration",
+			};
+		}).sort((a, b) => a.amount - b.amount));
 
 		this.getRoom().broadcast("gameEnded");
 	}
